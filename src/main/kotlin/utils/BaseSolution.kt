@@ -39,7 +39,7 @@ abstract class BaseSolution<T> {
     }
 
     private val day by lazy { this.getAoCDay() }
-    private val year = "2023"
+    private val year = "2024"
 
     abstract fun part1(input: List<String>): T
     abstract fun part2(input: List<String>): T
