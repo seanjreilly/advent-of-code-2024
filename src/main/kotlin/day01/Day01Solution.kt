@@ -12,7 +12,11 @@ class Day01Solution : IntSolution() {
             .sum()
     }
 
-    override fun part2(input: List<String>) = 0
+    override fun part2(input: List<String>): Int {
+        val (firstList, secondList) = parseLines(input)
+        val occurrences = countOccurrences(secondList)
+        return firstList.sumOf { it * (occurrences[it] ?: 0) }
+    }
 }
 
 internal fun parseLine(line: String) : Pair<Int,Int> {
@@ -24,6 +28,7 @@ internal fun parseLine(line: String) : Pair<Int,Int> {
 }
 
 internal fun absoluteDifference(a: Int, b: Int) = abs(a - b)
+internal fun countOccurrences(list: List<Any>)  = list.groupBy { it }.mapValues { it.value.size }
 
 private fun parseLines(lines: List<String>): Pair<List<Int>, List<Int>> {
     val firstList = mutableListOf<Int>()
