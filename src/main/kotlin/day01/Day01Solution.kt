@@ -20,22 +20,12 @@ class Day01Solution : IntSolution() {
 }
 
 internal fun absoluteDifference(a: Int, b: Int) = abs(a - b)
-internal fun countOccurrences(list: List<Any>)  = list.groupBy { it }.mapValues { it.value.size }
+internal fun countOccurrences(list: List<Any>) = list.groupingBy { it }.eachCount()
+internal fun parseLine(line: String) = line.split(' ').filter { it.isNotEmpty() }.map { it.toInt() }
 
-internal fun parseLine(line: String) : Pair<Int,Int> {
-    val integers = line
-        .split(' ', )
-        .filter { it.isNotEmpty() }
-        .map { it.toInt() }
-    return Pair(integers[0], integers[1])
-}
-
-private fun parseLines(lines: List<String>): Pair<List<Int>, List<Int>> {
-    val firstList = mutableListOf<Int>()
-    val secondList = mutableListOf<Int>()
-    lines.map { parseLine(it) }.forEach {
-        firstList += it.first
-        secondList += it.second
-    }
-    return firstList to secondList
+internal fun parseLines(lines: List<String>): Pair<List<Int>, List<Int>> {
+    val result = lines
+        .flatMap { parseLine(it).withIndex() }
+        .groupBy({ it.index }, { it.value }) //index will be zero or 1 because of where we added it
+    return result[0]!! to result[1]!!
 }
