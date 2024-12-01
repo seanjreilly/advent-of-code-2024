@@ -19,6 +19,9 @@ class Day01Solution : IntSolution() {
     }
 }
 
+internal fun absoluteDifference(a: Int, b: Int) = abs(a - b)
+internal fun countOccurrences(list: List<Any>)  = list.groupBy { it }.mapValues { it.value.size }
+
 internal fun parseLine(line: String) : Pair<Int,Int> {
     val integers = line
         .split(' ', )
@@ -26,9 +29,6 @@ internal fun parseLine(line: String) : Pair<Int,Int> {
         .map { it.toInt() }
     return Pair(integers[0], integers[1])
 }
-
-internal fun absoluteDifference(a: Int, b: Int) = abs(a - b)
-internal fun countOccurrences(list: List<Any>)  = list.groupBy { it }.mapValues { it.value.size }
 
 private fun parseLines(lines: List<String>): Pair<List<Int>, List<Int>> {
     val firstList = mutableListOf<Int>()
