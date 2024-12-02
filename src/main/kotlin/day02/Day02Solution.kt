@@ -18,9 +18,6 @@ internal fun isSafe(levels: List<Int>): Boolean {
     }
 }
 internal fun isSafeWithDampening(levels: List<Int>): Boolean {
-    if (isSafe(levels)) {
-        return true
-    }
     val indexedLevels = levels.withIndex()
     return (0 until levels.size).any { i ->
         val dampenedLevels = indexedLevels.filter { it.index != i  }.map { it.value }

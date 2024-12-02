@@ -64,11 +64,15 @@ class Day02SolutionTest {
     }
 
     @Test
-    fun `isSafeWithDampening should return true if removing a single level from the input would make it safe`() {
+    fun `isSafeWithDampening should return true if the levels are safe as they are `() {
         assert(isSafeWithDampening(parseLine(sampleInput[0])))
+        assert(isSafeWithDampening(parseLine(sampleInput[5])))
+    }
+
+    @Test
+    fun `isSafeWithDampening should return true if removing a single level from the input would make it safe`() {
         assert(isSafeWithDampening(parseLine(sampleInput[3])))
         assert(isSafeWithDampening(parseLine(sampleInput[4])))
-        assert(isSafeWithDampening(parseLine(sampleInput[5])))
     }
 
     @Test
