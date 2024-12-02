@@ -6,7 +6,7 @@ fun main() = Day02Solution().run()
 class Day02Solution : IntSolution() {
     override fun part1(input: List<String>) = input.map { parseLine(it) }.count { isSafe(it) }
 
-    override fun part2(input: List<String>) = input.map { parseLine(it) }.count { isSafe2(it) }
+    override fun part2(input: List<String>) = input.map { parseLine(it) }.count { isSafeWithDampening(it) }
 }
 
 internal fun parseLine(line: String) = line.split(' ').map(String::toInt)
@@ -17,7 +17,7 @@ internal fun isSafe(levels: List<Int>): Boolean {
         false -> levels.windowed(2).all { (first, second) -> first - second in allowedRange }
     }
 }
-internal fun isSafe2(levels: List<Int>): Boolean {
+internal fun isSafeWithDampening(levels: List<Int>): Boolean {
     if (isSafe(levels)) {
         return true
     }
