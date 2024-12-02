@@ -58,8 +58,32 @@ class Day02SolutionTest {
     }
 
     @Test
+    fun `isSafe2 should return true if removing a single level from the input would make it safe`() {
+        assert(isSafe2(parseLine(sampleInput[0])))
+        assert(isSafe2(parseLine(sampleInput[3])))
+        assert(isSafe2(parseLine(sampleInput[4])))
+        assert(isSafe2(parseLine(sampleInput[5])))
+    }
+
+    @Test
+    fun `isSafe2 should return false if removing any single level from the input still won't make it safe`() {
+        assert(!isSafe2(parseLine(sampleInput[1])))
+        assert(!isSafe2(parseLine(sampleInput[2])))
+    }
+
+    @Test
+    fun `isSafe2 should return true for otherwise valid levels where the first two numbers match`() {
+        assert(isSafe2(listOf(75, 75, 76, 77, 79, 81)))
+    }
+
+    @Test
     fun `part1 should count the number of safe levels`() {
         assert(solution.part1(sampleInput) == 2)
+    }
+
+    @Test
+    fun `part2 should count the number of safe levels with dampening`() {
+        assert(solution.part2(sampleInput) == 4)
     }
 }
 
