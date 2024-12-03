@@ -32,7 +32,7 @@ class Day03SolutionTest {
             8 to 5
         )
 
-        val instructions: List<Pair<Int,Int>> = findMulInstructions(sampleInput).toList()
+        val instructions: List<Pair<Int,Int>> = findMulInstructions(sampleInput)
         assert(instructions == expectedInstructions)
     }
 
