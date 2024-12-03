@@ -19,10 +19,7 @@ private val PARSE_INSTRUCTION_REGEX = """mul\((\d+),(\d+)\)""".toRegex()
 internal fun findMulInstructions(line: String): List<Pair<Int, Int>> {
     return PARSE_INSTRUCTION_REGEX
         .findAll(line)
-        .map { match ->
-            val groups = match.groups
-            groups[1]!!.value.toInt() to groups[2]!!.value.toInt()
-        }
+        .map { it.destructured.let { (x,y) -> x.toInt() to y.toInt()  } }
         .toList()
 }
 
