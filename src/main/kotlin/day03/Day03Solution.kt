@@ -11,7 +11,7 @@ class Day03Solution : IntSolution() {
 
     override fun part2(input: List<String>): Int {
         val joinedLines = input.joinToString("")
-        return findMulInstructions(findEnabledMulInstructions(joinedLines)).sumOf { (x, y) -> x * y }
+        return findMulInstructions(removeDisabledMulInstructions(joinedLines)).sumOf { (x, y) -> x * y }
     }
 }
 
@@ -23,7 +23,7 @@ internal fun findMulInstructions(line: String): List<Pair<Int, Int>> {
         .toList()
 }
 
-internal fun findEnabledMulInstructions(input: String): String {
+internal fun removeDisabledMulInstructions(input: String): String {
     return input
         .split("do()")
         .joinToString("") { it.split("don't()").first() }

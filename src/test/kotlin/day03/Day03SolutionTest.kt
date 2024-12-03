@@ -37,21 +37,21 @@ class Day03SolutionTest {
     }
 
     @Test
-    fun `findEnabledMulInstructions should find instructions before the initial don't() instruction`() {
+    fun `removeDisabledMulInstructions should find instructions before the initial don't() instruction`() {
         val expectedResult = "mul(1,2)mul(2,3)asdf"
         val input = "${expectedResult}don't()mul(3,4)ailhr"
 
-        val result = findEnabledMulInstructions(input)
+        val result = removeDisabledMulInstructions(input)
 
         assert(result == expectedResult)
     }
 
     @Test
-    fun `findEnabledMulInstructions should remove instructions after a don't() instruction but before a do instruction`() {
+    fun `removeDisabledMulInstructions should remove instructions after a don't() instruction but before a do instruction`() {
         val input = "abcddon't()efghijdo()klmnopqdon't()rstudo()vwxyz"
         val expectedResult = "abcdklmnopqvwxyz"
 
-        val result = findEnabledMulInstructions(input)
+        val result = removeDisabledMulInstructions(input)
 
         assert(result == expectedResult)
     }
