@@ -26,14 +26,8 @@ internal fun findMulInstructions(line: String): List<Pair<Int, Int>> {
         .toList()
 }
 
-val DO_INSTRUCTION_REGEX = """do\(\)""".toRegex()
 internal fun findEnabledMulInstructions(input: String): String {
-    return DO_INSTRUCTION_REGEX.splitToSequence(input)
-        .joinToString("") {
-            val index = it.indexOf("don't()")
-            when (index) {
-                -1 -> it
-                else -> it.substring(0 until index)
-            }
-        }
+    return input
+        .split("do()")
+        .joinToString("") { it.split("don't()").first() }
 }
