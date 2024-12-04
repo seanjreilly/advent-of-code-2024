@@ -52,6 +52,10 @@ data class Point(val x: Int, val y: Int) {
         return cardinalDirection.moveOperation.invoke(this)
     }
 
+    fun move(direction: Direction): Point {
+        return direction.moveOperation.invoke(this)
+    }
+
     infix fun facing(direction: CardinalDirection) = PointAndDirection(this, direction)
 }
 
@@ -80,6 +84,17 @@ enum class CardinalDirection(internal val moveOperation: (Point) -> Point) {
     }
 }
 
+enum class Direction(internal val moveOperation: (Point) -> Point) {
+    North(Point::north),
+    NorthEast(Point::northEast),
+    East(Point::east),
+    SouthEast(Point::southEast),
+    South(Point::south),
+    SouthWest(Point::southWest),
+    West(Point::west),
+    NorthWest(Point::northWest);
+}
+
 data class PointAndDirection(val point: Point, val direction: CardinalDirection)
 
 data class Bounds(val validXCoordinates: IntRange, val validYCoordinates: IntRange) : Iterable<Point> {
@@ -106,7 +121,7 @@ data class Bounds(val validXCoordinates: IntRange, val validYCoordinates: IntRan
 /*
     Common extension functions for accessing a nested array with a point
  */
-operator fun <T> Array<Array<T>>.get(p: Point) : T = this[p.x][p.y]
-operator fun Array<CharArray>.get(p: Point) = this[p.x][p.y]
-operator fun Array<IntArray>.get(p: Point) = this[p.x][p.y]
+operator fun <T> Array<Array<T>>.get(p: Point) : T = this[p.y][p.x]
+operator fun Array<CharArray>.get(p: Point) = this[p.y][p.x]
+operator fun Array<IntArray>.get(p: Point) = this[p.y][p.x]
 operator fun List<String>.get(p: Point) : Char = this[p.y][p.x]
