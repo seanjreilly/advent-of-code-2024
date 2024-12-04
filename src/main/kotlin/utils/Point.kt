@@ -92,7 +92,7 @@ enum class DiagonalDirection(internal val moveOperation: (Point) -> Point) {
 
     fun opposite(): DiagonalDirection {
         val index = DiagonalDirection.entries.indexOf(this) + 2
-        return DiagonalDirection.entries[index.mod(DiagonalDirection.entries.size)]
+        return DiagonalDirection.entries[index.mod(entries.size)]
     }
 }
 
@@ -105,6 +105,11 @@ enum class Direction(internal val moveOperation: (Point) -> Point) {
     SouthWest(Point::southWest),
     West(Point::west),
     NorthWest(Point::northWest);
+
+    fun opposite(): Direction {
+        val index = Direction.entries.indexOf(this) + 4
+        return Direction.entries[index.mod(entries.size)]
+    }
 }
 
 data class PointAndDirection(val point: Point, val direction: CardinalDirection)

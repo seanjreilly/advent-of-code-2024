@@ -201,4 +201,25 @@ class PointTest {
             assert(direction.opposite().opposite() == direction)
         }
     }
+
+    @Nested
+    inner class DirectionTest {
+        @Test
+        fun `opposite should return the opposite direction`() {
+            assert(Direction.North.opposite() == Direction.South)
+            assert(Direction.NorthEast.opposite() == Direction.SouthWest)
+            assert(Direction.East.opposite() == Direction.West)
+            assert(Direction.SouthEast.opposite() == Direction.NorthWest)
+            assert(Direction.South.opposite() == Direction.North)
+            assert(Direction.SouthWest.opposite() == Direction.NorthEast)
+            assert(Direction.West.opposite() == Direction.East)
+            assert(Direction.NorthWest.opposite() == Direction.SouthEast)
+        }
+
+        @ParameterizedTest
+        @EnumSource(Direction::class)
+        fun `calling opposite twice on a direction should return the original direction`(direction: Direction) {
+            assert(direction.opposite().opposite() == direction)
+        }
+    }
 }
