@@ -121,6 +121,7 @@ data class Bounds(val validXCoordinates: IntRange, val validYCoordinates: IntRan
     constructor(data: Array<CharArray>): this(data.first().indices, data.indices)
     constructor(data: Array<Array<*>>): this(data.first().indices, data.indices)
     constructor(data: Array<CharSequence>): this(data.first().indices, data.indices)
+    constructor(data: List<CharSequence>): this(data.first().indices, data.indices)
 
     val lastX = validXCoordinates.last
     val lastY = validYCoordinates.last
@@ -132,6 +133,12 @@ data class Bounds(val validXCoordinates: IntRange, val validYCoordinates: IntRan
                 yield(Point(x, y))
             }
         }
+    }
+
+    fun shrink(): Bounds {
+        val newXRange = (validXCoordinates.first + 1)..(validXCoordinates.last - 1)
+        val newYRange = (validYCoordinates.first + 1)..(validYCoordinates.last - 1)
+        return Bounds(newXRange, newYRange)
     }
 }
 

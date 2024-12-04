@@ -10,21 +10,19 @@ class Day04Solution : IntSolution() {
 }
 
 internal fun countXmasInstances(input: List<String>): Int {
-    val gridData = input.map { it.toCharArray().toTypedArray() }.toTypedArray()
-    val map = WordSearch(gridData)
+    val bounds = Bounds(input)
 
     fun moveNext(point: Point, dir: Direction) : Triple<Char, Point, Direction>? {
         val newPoint = point.move(dir)
-        if (newPoint !in map) {
+        if (newPoint !in bounds) {
             return null
         }
-        val newValue = map[newPoint]
+        val newValue = input[newPoint]
         return Triple(newValue, newPoint, dir)
     }
 
-    val startingPoints = map.filter { map[it] == 'X' }
-
-    return startingPoints
+    return bounds
+        .filter { input[it] == 'X' }
         .flatMap { start -> Direction.entries.map { dir -> Triple('X', start, dir) } }
         .mapNotNull { (_, point, dir) -> moveNext(point, dir) }
         .filter { (char, _, _) -> char == 'M' }
@@ -36,18 +34,11 @@ internal fun countXmasInstances(input: List<String>): Int {
 
 internal fun countMasCrossInstances(input: List<String>): Int {
     val gridData = input.map { it.toCharArray().toTypedArray() }.toTypedArray()
-    val map = WordSearch(gridData)
+    val bounds = Bounds(input).shrink() //'A' characters at the edge of the grid cannot be in a cross
 
-    val edgeXCoordinates = setOf(0, map.bounds.lastX)
-    val edgeYCoordinates = setOf(0, map.bounds.lastY)
-
-    val startingPoints = map
-        .filter { map[it] == 'A' }
-        //'A' characters at the edge of the grid cannot be in a cross
-        .filter { it.x !in edgeXCoordinates }
-        .filter { it.y !in edgeYCoordinates }
-
-    return startingPoints.count { detectDiagonalCross(gridData, it)  }
+    return bounds
+        .filter { input[it] == 'A' }
+        .count { detectDiagonalCross(gridData, it) }
 }
 
 internal fun detectDiagonalCross(grid: Array<Array<Char>>, centerPoint: Point): Boolean {
@@ -58,7 +49,3 @@ internal fun detectDiagonalCross(grid: Array<Array<Char>>, centerPoint: Point): 
         .windowed(2, step = 2)
         .count { chars -> chars == listOf('M', 'S') } == 2
 }
-
-private class WordSearch(gridData: Array<Array<Char>>) : GridMap<Char>(
-    gridData, getNeighboursMethod = Point::getCardinalAndDiagonalNeighbours
-)

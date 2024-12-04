@@ -222,4 +222,15 @@ class PointTest {
             assert(direction.opposite().opposite() == direction)
         }
     }
+
+    @Nested
+    inner class BoundsTest {
+        @Test
+        fun `shrink should return bounds one smaller on every side`() {
+            val bounds = Bounds(0..10, 0..20)
+            val expectedResult = Bounds(1..9, 1..19)
+            val smallerBounds: Bounds = bounds.shrink()
+            assert(smallerBounds == expectedResult)
+        }
+    }
 }
