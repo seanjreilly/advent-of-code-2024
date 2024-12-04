@@ -84,6 +84,18 @@ enum class CardinalDirection(internal val moveOperation: (Point) -> Point) {
     }
 }
 
+enum class DiagonalDirection(internal val moveOperation: (Point) -> Point) {
+    NorthEast(Point::northEast),
+    SouthEast(Point::southEast),
+    SouthWest(Point::southWest),
+    NorthWest(Point::northWest);
+
+    fun opposite(): DiagonalDirection {
+        val index = DiagonalDirection.entries.indexOf(this) + 2
+        return DiagonalDirection.entries[index.mod(DiagonalDirection.entries.size)]
+    }
+}
+
 enum class Direction(internal val moveOperation: (Point) -> Point) {
     North(Point::north),
     NorthEast(Point::northEast),
