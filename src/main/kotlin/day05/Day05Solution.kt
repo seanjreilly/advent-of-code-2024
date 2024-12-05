@@ -5,40 +5,19 @@ import utils.IntSolution
 fun main() = Day05Solution().run()
 class Day05Solution : IntSolution() {
     override fun part1(input: List<String>): Int {
-        val rules = parsePageOrderingRules(input)
+        val comparator = PageRuleComparator(parsePageOrderingRules(input))
         return parsePageUpdates(input)
-            .filter { isUpdateInRightOrder(it, rules) }
+            .filter { comparator.isUpdateInRightOrder(it) }
             .sumOf { findMiddle(it) }
     }
 
     override fun part2(input: List<String>): Int {
-        val rules = parsePageOrderingRules(input)
-        val comparator = PageRuleComparator(rules)
+        val comparator = PageRuleComparator(parsePageOrderingRules(input))
         return parsePageUpdates(input)
-            .filter { !isUpdateInRightOrder(it, rules) }
-            .map { fixPageOrders(it, comparator) }
+            .filter { !comparator.isUpdateInRightOrder(it) }
+            .map { comparator.fixPageOrders(it) }
             .sumOf { findMiddle(it) }
     }
-}
-
-internal fun isUpdateInRightOrder(pageUpdate: List<Int>, rules: List<PageOrderingRule>): Boolean {
-    val pagePositions = pageUpdate.mapIndexed { index, pageNumber -> pageNumber to index }.toMap()
-
-    fun isRuleViolated(rule: PageOrderingRule): Boolean {
-        if (rule.before !in pagePositions) {
-            return false
-        }
-        if (rule.after !in pagePositions) {
-            return false
-        }
-        return pagePositions[rule.before]!! > pagePositions[rule.after]!!
-    }
-
-    return rules.none { isRuleViolated(it) }
-}
-
-internal fun fixPageOrders(pageUpdate: List<Int>, comparator: PageRuleComparator): List<Int> {
-    return pageUpdate.sortedWith(comparator)
 }
 
 internal fun <T> findMiddle(list: List<T>): T {
@@ -63,6 +42,17 @@ internal class PageRuleComparator(rules: List<PageOrderingRule>) : Comparator<In
             else -> 0
         }
     }
+
+    fun isUpdateInRightOrder(pageUpdate: List<Int>): Boolean {
+        val pagesVisitedSoFar = mutableSetOf<Int>()
+        return pageUpdate.all { page ->
+            val result = pagesVisitedSoFar.intersect(index[page] ?: emptySet)
+            pagesVisitedSoFar += page
+            result.isEmpty()
+        }
+    }
+
+    fun fixPageOrders(pageUpdate: List<Int>) = pageUpdate.sortedWith(this)
 }
 
 internal data class PageOrderingRule(val before: Int, val after: Int)

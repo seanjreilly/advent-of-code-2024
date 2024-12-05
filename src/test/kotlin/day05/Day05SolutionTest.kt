@@ -90,41 +90,6 @@ class Day05SolutionTest {
     }
 
     @Test
-    fun `isUpdateInRightOrder should return true if all of the PageOrderingRules that refer to pages in this update are followed`() {
-        val pageOrderingRules = parsePageOrderingRules(sampleInput)
-        val pageUpdate = parsePageUpdates(sampleInput)[0]
-        val result: Boolean = isUpdateInRightOrder(pageUpdate, pageOrderingRules)
-        assert(result)
-    }
-
-    @Test
-    fun `isUpdateInRightOrder should return false for an update with two pages in an order that violates any PageOrderingRule, given simple PageOrderingRules`() {
-        val rulesDefinition = """
-            1|2
-            2|3
-            3|4
-
-        """.trimIndent().lines()
-        val pageOrderingRules = parsePageOrderingRules(rulesDefinition)
-        val pageUpdate = listOf(1, 2, 4, 3)
-        val result: Boolean = isUpdateInRightOrder(pageUpdate, pageOrderingRules)
-        assert(!result)
-    }
-
-    @Test
-    fun `isUpdateInRightOrder should return the expected answers given examples from the problem`() {
-        val pageOrderingRules = parsePageOrderingRules(sampleInput)
-        val pageUpdates = parsePageUpdates(sampleInput)
-
-        assert(isUpdateInRightOrder(pageUpdates[0], pageOrderingRules))
-        assert(isUpdateInRightOrder(pageUpdates[1], pageOrderingRules))
-        assert(isUpdateInRightOrder(pageUpdates[2], pageOrderingRules))
-        assert(!isUpdateInRightOrder(pageUpdates[3], pageOrderingRules))
-        assert(!isUpdateInRightOrder(pageUpdates[4], pageOrderingRules))
-        assert(!isUpdateInRightOrder(pageUpdates[5], pageOrderingRules))
-    }
-
-    @Test
     fun `findMiddle should find the middle number in a list of odd length`() {
         val list = listOf(75, 47, 61, 53, 29)
         val result: Int = findMiddle(list)
@@ -189,15 +154,57 @@ class Day05SolutionTest {
             assert(comparator.compare(1, null) == 0)
             assert(comparator.compare(null, 1) == 0)
         }
-    }
 
-    @Test
-    fun `fixPageOrders should use the page rules to fix the order of a badly ordered update`() {
-        val comparator = PageRuleComparator(parsePageOrderingRules(sampleInput))
+        @Test
+        fun `isUpdateInRightOrder should return true if all of the PageOrderingRules that refer to pages in this update are followed`() {
+            val pageOrderingRules = parsePageOrderingRules(sampleInput)
+            val pageUpdate = parsePageUpdates(sampleInput)[0]
+            val instance = PageRuleComparator(pageOrderingRules)
 
-        assert(fixPageOrders(listOf(75, 97, 47, 61, 53), comparator) == listOf(97, 75, 47, 61, 53))
-        assert(fixPageOrders(listOf(61, 13, 29), comparator) == listOf(61, 29, 13))
-        assert(fixPageOrders(listOf(97, 13, 75, 29, 47), comparator) == listOf(97, 75, 47, 29, 13))
+            val result: Boolean = instance.isUpdateInRightOrder(pageUpdate)
+
+            assert(result)
+        }
+
+        @Test
+        fun `isUpdateInRightOrder should return false for an update with two pages in an order that violates any PageOrderingRule, given simple PageOrderingRules`() {
+            val rulesDefinition = """
+                1|2
+                2|3
+                3|4
+    
+            """.trimIndent().lines()
+            val pageOrderingRules = parsePageOrderingRules(rulesDefinition)
+            val pageUpdate = listOf(1, 2, 4, 3)
+            val instance = PageRuleComparator(pageOrderingRules)
+
+
+            val result: Boolean = instance.isUpdateInRightOrder(pageUpdate)
+            assert(!result)
+        }
+
+        @Test
+        fun `isUpdateInRightOrder should return the expected answers given examples from the problem`() {
+            val pageOrderingRules = parsePageOrderingRules(sampleInput)
+            val pageUpdates = parsePageUpdates(sampleInput)
+            val instance = PageRuleComparator(pageOrderingRules)
+
+            assert(instance.isUpdateInRightOrder(pageUpdates[0]))
+            assert(instance.isUpdateInRightOrder(pageUpdates[1]))
+            assert(instance.isUpdateInRightOrder(pageUpdates[2]))
+            assert(!instance.isUpdateInRightOrder(pageUpdates[3]))
+            assert(!instance.isUpdateInRightOrder(pageUpdates[4]))
+            assert(!instance.isUpdateInRightOrder(pageUpdates[5]))
+        }
+
+        @Test
+        fun `fixPageOrders should use the page rules to fix the order of a badly ordered update`() {
+            val comparator = PageRuleComparator(parsePageOrderingRules(sampleInput))
+
+            assert(comparator.fixPageOrders(listOf(75, 97, 47, 61, 53)) == listOf(97, 75, 47, 61, 53))
+            assert(comparator.fixPageOrders(listOf(61, 13, 29)) == listOf(61, 29, 13))
+            assert(comparator.fixPageOrders(listOf(97, 13, 75, 29, 47)) == listOf(97, 75, 47, 29, 13))
+        }
     }
 
     @Test
