@@ -11,7 +11,14 @@ class Day05Solution : IntSolution() {
             .sumOf { findMiddle(it) }
     }
 
-    override fun part2(input: List<String>) = 0
+    override fun part2(input: List<String>): Int {
+        val rules = parsePageOrderingRules(input)
+        val comparator = PageRuleComparator(rules)
+        return parsePageUpdates(input)
+            .filter { !isUpdateInRightOrder(it, rules) }
+            .map { fixPageOrders(it, comparator) }
+            .sumOf { findMiddle(it) }
+    }
 }
 
 internal fun isUpdateInRightOrder(pageUpdate: List<Int>, rules: List<PageOrderingRule>): Boolean {
@@ -30,6 +37,39 @@ internal fun isUpdateInRightOrder(pageUpdate: List<Int>, rules: List<PageOrderin
     return rules.none { isRuleViolated(it) }
 }
 
+internal fun fixPageOrders(pageUpdate: List<Int>, comparator: PageRuleComparator): List<Int> {
+    return pageUpdate.sortedWith(comparator)
+}
+
+internal fun <T> findMiddle(list: List<T>): T {
+    if (list.size % 2 == 0) {
+        throw IllegalArgumentException("Need a list of odd length to find the middle")
+    }
+    return list[list.size/2]
+}
+
+internal class PageRuleComparator(rules: List<PageOrderingRule>) : Comparator<Int> {
+    //index the rules by the before page, with a set of after pages as the map value
+    private val index = rules.groupBy { it.before  }.mapValues { entry -> entry.value.map { it.after }.toSet() }
+    private val emptySet = emptySet<Int>()
+
+    override fun compare(o1: Int?, o2: Int?): Int {
+        if (o1 == null || o2 == null) {
+            return 0
+        }
+        if (o1 == o2) {
+            return 0
+        }
+        if (o2 in (index[o1] ?: emptySet)) {
+            return -1
+        }
+        if (o1 in (index[o2] ?: emptySet)) {
+            return 1
+        }
+        return 0
+    }
+}
+
 internal data class PageOrderingRule(val before: Int, val after: Int)
 internal fun parsePageOrderingRules(input: List<String>): List<PageOrderingRule> {
     return input
@@ -45,11 +85,4 @@ internal fun parsePageUpdates(input: List<String>): List<List<Int>> {
         .dropWhile { it.isNotBlank() }
         .drop(1)
         .map { line -> line.split(',').map(String::toInt) }
-}
-
-internal fun <T> findMiddle(list: List<T>): T {
-    if (list.size % 2 == 0) {
-        throw IllegalArgumentException("Need a list of odd length to find the middle")
-    }
-    return list[list.size/2]
 }
