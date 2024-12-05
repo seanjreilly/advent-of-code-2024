@@ -45,38 +45,34 @@ internal fun <T> findMiddle(list: List<T>): T {
     if (list.size % 2 == 0) {
         throw IllegalArgumentException("Need a list of odd length to find the middle")
     }
-    return list[list.size/2]
+    return list[list.size / 2]
 }
 
 internal class PageRuleComparator(rules: List<PageOrderingRule>) : Comparator<Int> {
     //index the rules by the before page, with a set of after pages as the map value
-    private val index = rules.groupBy { it.before  }.mapValues { entry -> entry.value.map { it.after }.toSet() }
+    private val index = rules.groupBy { it.before }.mapValues { entry -> entry.value.map { it.after }.toSet() }
     private val emptySet = emptySet<Int>()
 
     override fun compare(o1: Int?, o2: Int?): Int {
-        if (o1 == null || o2 == null) {
-            return 0
+        return when {
+            o1 == null -> 0
+            o2 == null -> 0
+            o1 == o2 -> 0
+            o2 in (index[o1] ?: emptySet) -> -1
+            o1 in (index[o2] ?: emptySet) -> 1
+            else -> 0
         }
-        if (o1 == o2) {
-            return 0
-        }
-        if (o2 in (index[o1] ?: emptySet)) {
-            return -1
-        }
-        if (o1 in (index[o2] ?: emptySet)) {
-            return 1
-        }
-        return 0
     }
 }
 
 internal data class PageOrderingRule(val before: Int, val after: Int)
+
 internal fun parsePageOrderingRules(input: List<String>): List<PageOrderingRule> {
     return input
         .takeWhile { line -> line.isNotBlank() }
         .flatMap { line -> line.split('|') }
         .map(String::toInt)
-        .windowed(2,2)
+        .windowed(2, 2)
         .map { (before, after) -> PageOrderingRule(before, after) }
 }
 
