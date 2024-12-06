@@ -25,8 +25,11 @@ class Day06Solution : IntSolution() {
         val bounds = Bounds(input)
         return bounds
             .filter { input[it] == '.' }
+            .parallelStream()
             .map { potentialObstruction -> addObstruction(input, potentialObstruction) }
-            .count { gridWithNewObstruction -> detectLoop(gridWithNewObstruction) }
+            .filter { gridWithNewObstruction -> detectLoop(gridWithNewObstruction) }
+            .count()
+            .toInt()
     }
 }
 
