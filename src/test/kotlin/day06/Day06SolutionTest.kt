@@ -134,7 +134,48 @@ class Day06SolutionTest {
     }
 
     @Test
+    fun `addObstruction should return a modified map with an additional obstruction`() {
+        val grid = """
+            .^.
+            ...
+            ...
+        """.trimIndent().lines()
+
+        val expectedResult = """
+            .^.
+            ...
+            #..
+        """.trimIndent().lines()
+
+        val result: List<String> = addObstruction(grid, Point(0, 2))
+
+        assert(result == expectedResult)
+    }
+
+    @Test
+    fun `detectLoop should return false if the guard leaves the map`() {
+        val result: Boolean = detectLoop(sampleInput)
+
+        assert(!result)
+    }
+
+    @Test
+    fun `detectLoop should return true if the guard enters an infinite loop`() {
+        val obstruction = Point(3, 6)
+        val grid = addObstruction(sampleInput, obstruction)
+
+        val result: Boolean = detectLoop(grid)
+
+        assert(result)
+    }
+
+    @Test
     fun `part1 should move until the guard leaves the map and return the number of unique points visited, ignoring direction`() {
         assert(solution.part1(sampleInput) == 41)
+    }
+
+    @Test
+    fun `part2 should attempt to add an obstruction in every location and count the number of positions that cause the guard to enter an infinite loop`() {
+        assert(solution.part2(sampleInput) == 6)
     }
 }
