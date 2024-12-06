@@ -11,20 +11,26 @@ import utils.get
 fun main() = Day06Solution().run()
 class Day06Solution : IntSolution() {
     override fun part1(input: List<String>): Int {
-        return findPointsVisitedBeforeExiting(input).size
+        val (exitPath, _) = findExitPath(input)
+        return exitPath.map { it.point }.toSet().size
     }
 
     override fun part2(input: List<String>) : Int {
-        //only calculate these once
-        val bounds = Bounds(input)
-        var start = findStart(input)
+        val (originalPath, bounds) = findExitPath(input)
+        fun findStartPoint(potentialObstruction: Point) : PointAndDirection {
+            val pathIndexOfObstruction = originalPath.withIndex()
+                .first { (_, pointAndDirection) -> pointAndDirection.point == potentialObstruction }
+                .index
+            return originalPath[pathIndexOfObstruction-1]
+        }
 
-        //adding an obstruction to a point the guard doesn't visit cannot create a loop
-        return findPointsVisitedBeforeExiting(input)
+        //only consider points on the original path — adding an obstruction elsewhere cannot create a loop
+        return originalPath
+            .map { it.point }.toSet()
             .parallelStream()
             .filter { input[it] == '.' }
-            .map { potentialObstruction -> addObstruction(input, potentialObstruction) }
-            .filter { gridWithNewObstruction -> detectLoop(gridWithNewObstruction, bounds, start) }
+            .map { potentialObstruction -> potentialObstruction to addObstruction(input, potentialObstruction) }
+            .filter { (potentialObstruction, gridWithNewObstruction) -> detectLoop(gridWithNewObstruction, bounds, findStartPoint(potentialObstruction)) }
             .count()
             .toInt()
     }
@@ -43,15 +49,17 @@ internal fun detectLoop(grid: List<String>, bounds: Bounds, start: PointAndDirec
     return false
 }
 
-private fun findPointsVisitedBeforeExiting(input: List<String>): MutableSet<Point> {
+private fun findExitPath(input: List<String>): Pair<List<PointAndDirection>, Bounds> {
     val bounds = Bounds(input)
-    var guard = findStart(input)
-    val pointsVisited = mutableSetOf<Point>()
+    val start = findStart(input)
+
+    var guard = start
+    val path = mutableListOf<PointAndDirection>()
     do {
-        pointsVisited += guard.point
+        path += guard
         guard = moveNext(guard, input)
     } while (guard.point in bounds)
-    return pointsVisited
+    return path to bounds
 }
 
 internal fun moveNext(pointAndDirection: PointAndDirection, grid: List<String>): PointAndDirection {
