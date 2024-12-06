@@ -1,10 +1,12 @@
 package day06
 
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 import utils.Bounds
 import utils.CardinalDirection.*
 import utils.Point
 import utils.PointAndDirection
+import java.util.concurrent.TimeUnit
 
 class Day06SolutionTest {
     private val sampleInput = """
@@ -178,5 +180,11 @@ class Day06SolutionTest {
     @Test
     fun `part2 should attempt to add an obstruction in every location and count the number of positions that cause the guard to enter an infinite loop`() {
         assert(solution.part2(sampleInput) == 6)
+    }
+
+    @Test
+    @Timeout(500, unit = TimeUnit.MILLISECONDS)
+    fun `part2 should run quickly on production input`() {
+        solution.part2(solution.readInput())
     }
 }
