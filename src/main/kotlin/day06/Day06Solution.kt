@@ -15,21 +15,24 @@ class Day06Solution : IntSolution() {
     }
 
     override fun part2(input: List<String>) : Int {
+        //only calculate these once
+        val bounds = Bounds(input)
+        var start = findStart(input)
+
         //adding an obstruction to a point the guard doesn't visit cannot create a loop
         return findPointsVisitedBeforeExiting(input)
             .parallelStream()
             .filter { input[it] == '.' }
             .map { potentialObstruction -> addObstruction(input, potentialObstruction) }
-            .filter { gridWithNewObstruction -> detectLoop(gridWithNewObstruction) }
+            .filter { gridWithNewObstruction -> detectLoop(gridWithNewObstruction, bounds, start) }
             .count()
             .toInt()
     }
 }
 
-internal fun detectLoop(grid: List<String>): Boolean {
-    val bounds = Bounds(grid)
-    var guard = findStart(grid)
-    val previousPositions = mutableSetOf(guard)
+internal fun detectLoop(grid: List<String>, bounds: Bounds, start: PointAndDirection): Boolean {
+    val previousPositions = mutableSetOf(start)
+    var guard = start
     do {
         guard = moveNext(guard, grid)
         if (guard in previousPositions) {

@@ -1,6 +1,7 @@
 package day06
 
 import org.junit.jupiter.api.Test
+import utils.Bounds
 import utils.CardinalDirection.*
 import utils.Point
 import utils.PointAndDirection
@@ -154,7 +155,7 @@ class Day06SolutionTest {
 
     @Test
     fun `detectLoop should return false if the guard leaves the map`() {
-        val result: Boolean = detectLoop(sampleInput)
+        val result: Boolean = detectLoop(sampleInput, Bounds(sampleInput), findStart(sampleInput))
 
         assert(!result)
     }
@@ -164,7 +165,7 @@ class Day06SolutionTest {
         val obstruction = Point(3, 6)
         val grid = addObstruction(sampleInput, obstruction)
 
-        val result: Boolean = detectLoop(grid)
+        val result: Boolean = detectLoop(grid, Bounds(grid), findStart(grid))
 
         assert(result)
     }
