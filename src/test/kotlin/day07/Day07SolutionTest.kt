@@ -45,6 +45,25 @@ class Day07SolutionTest {
         assert(result == expectedResult)
     }
 
+    @Test
+    fun `concatenate should return the correct answer for many examples`() {
+        assert(concatenate(12L, 345L) == 12345L)
+        assert(concatenate(12345L, 6789L) == 123456789L)
+        assert(concatenate(87654321L, 12345678L) == 8765432112345678L)
+    }
+
+    @Test
+    fun `numberOfDecimalDigits should return the correct number of decimal digits`() {
+        assert(1L.numberOfDecimalDigits() == 1)
+        assert(9L.numberOfDecimalDigits() == 1)
+        assert(10L.numberOfDecimalDigits() == 2)
+        assert(99L.numberOfDecimalDigits() == 2)
+        assert(100L.numberOfDecimalDigits() == 3)
+        assert(999L.numberOfDecimalDigits() == 3)
+        assert(1000L.numberOfDecimalDigits() == 4)
+        assert(123456789L.numberOfDecimalDigits() == 9)
+    }
+
     @Nested
     inner class CalibrationEquationTest {
         @Test
@@ -112,5 +131,10 @@ class Day07SolutionTest {
     fun `part2 should return the sum of the test values for all CalibrationEquations that could be valid using the part 2 operators`() {
         assert(solution.part2(sampleInput) == 11387L)
 
+    }
+
+    @Test
+    fun `count the combinatorials`() {
+        println(parseInput(solution.readInput()).maxOf { equation -> equation.inputs.size })
     }
 }

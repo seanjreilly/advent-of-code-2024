@@ -10,12 +10,31 @@ class Day07Solution : LongSolution() {
 
 private fun solve(input: List<String>, operators: OperatorsList): Long {
     return parseInput(input)
+        .parallelStream()
         .filter { it.couldBeValid(operators) }
-        .sumOf { it.testValue }
+        .map { it.testValue }
+        .toList()
+        .sum()
 }
 
 internal fun concatenate(left: Long, right: Long): Long {
-    return  "${left}${right}".toLong()
+    return (left * tenToThePowerOf(right.numberOfDecimalDigits())) + right
+}
+
+internal fun Long.numberOfDecimalDigits() : Int {
+    var result = 1
+    var remaining = this
+    while (remaining > 9L) {
+        result++
+        remaining = remaining / 10
+    }
+    return result
+}
+
+internal fun tenToThePowerOf(n: Int) : Long {
+    var result = 1L
+    repeat(n) { result *= 10 }
+    return result
 }
 
 //region operator definitions
