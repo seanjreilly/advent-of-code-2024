@@ -32,16 +32,16 @@ class Day07SolutionTest {
             CalibrationEquation(292, 11, 6, 16, 20)
         )
 
-        val result : List<CalibrationEquation> = parseInput(sampleInput)
+        val result: List<CalibrationEquation> = parseInput(sampleInput)
 
-        assert (result.size == expectedResult.size)
+        assert(result.size == expectedResult.size)
         result.forEachIndexed { index, result -> assert(result == expectedResult[index]) }
     }
 
     @Test
     fun `concatenate should combine the digits from its operands into a single number`() {
         val expectedResult = 12345L
-        val result : Long = concatenate(12L, 345L)
+        val result: Long = concatenate(12L, 345L)
         assert(result == expectedResult)
     }
 
@@ -85,7 +85,7 @@ class Day07SolutionTest {
             )
 
             viableEquations.forEach { equation ->
-                val result : Boolean = equation.couldBeValid()
+                val result: Boolean = equation.couldBeValid()
                 assert(result)
             }
         }
@@ -95,7 +95,7 @@ class Day07SolutionTest {
             val nonViableEquations = parseInput(sampleInput).drop(2).dropLast(1)
 
             nonViableEquations.forEach { equation ->
-                val result : Boolean = equation.couldBeValid()
+                val result: Boolean = equation.couldBeValid()
                 assert(!result)
             }
         }
@@ -108,7 +108,7 @@ class Day07SolutionTest {
                 CalibrationEquation(292, 11, 6, 16, 20)
             )
 
-            val additionalViableEquations = listOf (
+            val additionalViableEquations = listOf(
                 CalibrationEquation(156, 15, 6),
                 CalibrationEquation(7290, 6, 8, 6, 15),
                 CalibrationEquation(192, 17, 8, 14)
@@ -116,7 +116,7 @@ class Day07SolutionTest {
             viableEquations += additionalViableEquations
 
             viableEquations.forEach { equation ->
-                val result : Boolean = equation.couldBeValid(PART2_OPERATORS)
+                val result: Boolean = equation.couldBeValid(PART2_OPERATORS)
                 assert(result)
             }
         }
