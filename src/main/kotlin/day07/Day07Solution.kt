@@ -10,18 +10,33 @@ class Day07Solution : LongSolution() {
             .sumOf { it.testValue }
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>): Long {
+        return parseInput(input)
+            .filter { it.couldBeValid(PART2_OPERATORS) }
+            .sumOf { it.testValue }
+    }
 }
 
-private val OPERATORS : List<(Long, Long) -> Long> = listOf(Long::plus, Long::times)
+internal fun concatenate(left: Long, right: Long): Long {
+    return  "${left}${right}".toLong()
+}
+
+//region operator definitions
+
+typealias OperatorsList = List<(Long, Long) -> Long>
+private val PART1_OPERATORS : OperatorsList = listOf(Long::plus, Long::times)
+internal val PART2_OPERATORS = PART1_OPERATORS + ::concatenate
+
+//endregion
+
 internal data class CalibrationEquation(val testValue: Long, val inputs: List<Long>) {
-    fun couldBeValid(): Boolean {
+    fun couldBeValid(operators: OperatorsList = PART1_OPERATORS): Boolean {
         var lastRoundOfResults = listOf(inputs.first())
         var tail = inputs.drop(1)
         while (tail.isNotEmpty()) {
             val currentValue = tail.first()
             tail = tail.drop(1)
-            val nextRoundOfResults = OPERATORS.flatMap { operator ->
+            val nextRoundOfResults = operators.flatMap { operator ->
                 lastRoundOfResults
                     .map { operator.invoke(it, currentValue) }
                     .filter { it <= testValue  }

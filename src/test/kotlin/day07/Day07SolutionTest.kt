@@ -38,6 +38,13 @@ class Day07SolutionTest {
         result.forEachIndexed { index, result -> assert(result == expectedResult[index]) }
     }
 
+    @Test
+    fun `concatenate should combine the digits from its operands into a single number`() {
+        val expectedResult = 12345L
+        val result : Long = concatenate(12L, 345L)
+        assert(result == expectedResult)
+    }
+
     @Nested
     inner class CalibrationEquationTest {
         @Test
@@ -73,10 +80,37 @@ class Day07SolutionTest {
                 assert(!result)
             }
         }
+
+        @Test
+        fun `couldBeValid should return true for more calibration equations using the expanded set of operators in part 2`() {
+            val viableEquations = mutableListOf(
+                CalibrationEquation(190, 10, 19),
+                CalibrationEquation(3267, 81, 40, 27),
+                CalibrationEquation(292, 11, 6, 16, 20)
+            )
+
+            val additionalViableEquations = listOf (
+                CalibrationEquation(156, 15, 6),
+                CalibrationEquation(7290, 6, 8, 6, 15),
+                CalibrationEquation(192, 17, 8, 14)
+            )
+            viableEquations += additionalViableEquations
+
+            viableEquations.forEach { equation ->
+                val result : Boolean = equation.couldBeValid(PART2_OPERATORS)
+                assert(result)
+            }
+        }
     }
 
     @Test
     fun `part1 should return the sum of the test values for all CalibrationEquations that could be valid`() {
         assert(solution.part1(sampleInput) == 3749L)
+    }
+
+    @Test
+    fun `part2 should return the sum of the test values for all CalibrationEquations that could be valid using the part 2 operators`() {
+        assert(solution.part2(sampleInput) == 11387L)
+
     }
 }
