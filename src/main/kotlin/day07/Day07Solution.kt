@@ -22,8 +22,9 @@ internal data class CalibrationEquation(val testValue: Long, val inputs: List<Lo
             val currentValue = tail.first()
             tail = tail.drop(1)
             val nextRoundOfResults = OPERATORS.flatMap { operator ->
-                val resultsToAdd: List<Long> = lastRoundOfResults.map { it: Long -> operator.invoke(it, currentValue) }
-                resultsToAdd
+                lastRoundOfResults
+                    .map { operator.invoke(it, currentValue) }
+                    .filter { it <= testValue  }
             }
             lastRoundOfResults = nextRoundOfResults
         }
