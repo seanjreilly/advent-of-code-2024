@@ -4,17 +4,14 @@ import utils.LongSolution
 
 fun main() = Day07Solution().run()
 class Day07Solution : LongSolution() {
-    override fun part1(input: List<String>): Long {
-        return parseInput(input)
-            .filter { it.couldBeValid() }
-            .sumOf { it.testValue }
-    }
+    override fun part1(input: List<String>) = solve(input, PART1_OPERATORS)
+    override fun part2(input: List<String>) = solve(input, PART2_OPERATORS)
+}
 
-    override fun part2(input: List<String>): Long {
-        return parseInput(input)
-            .filter { it.couldBeValid(PART2_OPERATORS) }
-            .sumOf { it.testValue }
-    }
+private fun solve(input: List<String>, operators: OperatorsList): Long {
+    return parseInput(input)
+        .filter { it.couldBeValid(operators) }
+        .sumOf { it.testValue }
 }
 
 internal fun concatenate(left: Long, right: Long): Long {
