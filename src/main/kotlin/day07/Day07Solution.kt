@@ -12,8 +12,7 @@ private fun solve(input: List<String>, operators: OperatorsList): Long {
     return parseInput(input)
         .parallelStream()
         .filter { it.couldBeValid(operators) }
-        .map { it.testValue }
-        .toList()
+        .mapToLong { it.testValue }
         .sum()
 }
 
