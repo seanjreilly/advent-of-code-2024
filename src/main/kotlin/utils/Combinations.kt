@@ -1,8 +1,7 @@
 package utils
 
 internal fun <T> List<T>.twoElementCombinations() : Sequence<Pair<T, T>> {
-    require(size >= 2) { "must have at least 2 elements in the list to generate 2 element combinations" }
-
+    require(size >= 2) { "must have at least 2 elements to generate 2 element combinations" }
     val theList = this
     return sequence {
         for (i in 0 until (size - 1)) {
@@ -13,4 +12,4 @@ internal fun <T> List<T>.twoElementCombinations() : Sequence<Pair<T, T>> {
     }
 }
 
-internal fun <T> Collection<T>.twoElementCombinations() : Sequence<Pair<T,T>> = this.toList().twoElementCombinations()
+internal fun <T> Iterable<T>.twoElementCombinations() : Sequence<Pair<T,T>> = this.toList().twoElementCombinations()

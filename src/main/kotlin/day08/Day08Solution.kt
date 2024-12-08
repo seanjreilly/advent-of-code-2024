@@ -4,6 +4,7 @@ import utils.Bounds
 import utils.IntSolution
 import utils.Point
 import utils.get
+import utils.twoElementCombinations
 
 fun main() = Day08Solution().run()
 class Day08Solution : IntSolution() {
@@ -28,7 +29,7 @@ internal fun findAntinodes(
     operation: FindAntinodesOperation = ::findAntinodesBetween
 ): Set<Point> {
     return points
-        .generateTwoElementPairs()
+        .twoElementCombinations()
         .flatMap { (a, b) -> operation(a, b, bounds) }
         .toSet()
 }
@@ -63,17 +64,6 @@ internal fun findAntinodesBetweenWithResonantHarmonics(a: Point, b: Point, bound
     }
 
     return (move(1) + move(-1)).toSet()
-}
-
-internal fun <T> Set<T>.generateTwoElementPairs(): Sequence<Pair<T, T>> {
-    var values = this.toList()
-    return sequence {
-        while (values.isNotEmpty()) {
-            val first = values.first()
-            values = values.drop(1)
-            yieldAll(values.map { first to it })
-        }
-    }
 }
 
 internal fun parseAntennaLocations(input: List<String>): AntennaMap {

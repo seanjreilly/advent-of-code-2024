@@ -37,41 +37,6 @@ class Day08SolutionTest {
     private val solution = Day08Solution()
 
     @Test
-    fun `generateTwoElementPairs should generate all of the unique 2 element pairs of a Set in any order`() {
-        val set = setOf("A", "B", "C", "D")
-        val expectedResult = setOf(
-            "A" to "B",
-            "A" to "C",
-            "A" to "D",
-            "B" to "C",
-            "B" to "D",
-            "C" to "D"
-        )
-
-        val result : Sequence<Pair<String, String>> = set.generateTwoElementPairs()
-
-        assert(result.toSet() == expectedResult) //convert the result to a set to ignore order
-    }
-
-    @Test
-    fun `generateTwoElementPairs should work for Points`() {
-        val p1 = Point(1, 1)
-        val p2 = Point(2, 2)
-        val p3 = Point(3, 3)
-        val points = setOf(p1, p2, p3)
-
-        val expectedResult = setOf(
-            p1 to p2,
-            p1 to p3,
-            p2 to p3
-        )
-
-        val result : Sequence<Pair<Point, Point>> = points.generateTwoElementPairs()
-
-        assert(result.toSet() == expectedResult)
-    }
-
-    @Test
     fun `parseAntennaLocations should return a map of antenna frequencies to antenna locations`() {
         val antennaLocations : AntennaMap = parseAntennaLocations(sampleInput)
         val expectedZeroLocations = setOf(
