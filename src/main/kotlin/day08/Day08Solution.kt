@@ -7,30 +7,25 @@ import utils.get
 
 fun main() = Day08Solution().run()
 class Day08Solution : IntSolution() {
-    override fun part1(input: List<String>): Int {
-        val bounds = Bounds(input)
-        return parseAntennaLocations(input).values
-            .flatMap { antennaLocations -> findAntinodes(antennaLocations, bounds) }
-            .distinct()
-            .size
-    }
+    override fun part1(input: List<String>) = solve(input, ::findAntinodesBetween)
+    override fun part2(input: List<String>) = solve(input, ::findAntinodesBetweenWithResonantHarmonics)
+}
 
-    override fun part2(input: List<String>): Int {
-        val bounds = Bounds(input)
-        return parseAntennaLocations(input).values
-            .flatMap { antennaLocations -> findAntinodes(antennaLocations, bounds, ::findAntinodesBetweenWithResonantHarmonics) }
-            .distinct()
-            .size
-    }
+private fun solve(input: List<String>, operation: FindAntinodesOperation): Int {
+    val bounds = Bounds(input)
+    return parseAntennaLocations(input).values
+        .flatMap { antennaLocations -> findAntinodes(antennaLocations, bounds, operation) }
+        .distinct()
+        .size
 }
 
 internal typealias AntennaMap = Map<Char, Set<Point>>
-internal typealias findAntinodesOperation = (Point, Point, Bounds) -> Set<Point>
+internal typealias FindAntinodesOperation = (Point, Point, Bounds) -> Set<Point>
 
 internal fun findAntinodes(
     points: Set<Point>,
     bounds: Bounds,
-    operation: findAntinodesOperation = ::findAntinodesBetween
+    operation: FindAntinodesOperation = ::findAntinodesBetween
 ): Set<Point> {
     return points
         .generateTwoElementPairs()
