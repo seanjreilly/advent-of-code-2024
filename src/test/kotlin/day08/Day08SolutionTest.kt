@@ -21,6 +21,19 @@ class Day08SolutionTest {
         ............
     """.trimIndent().lines()
 
+    private val sampleInputPart2 = """
+        T....#....
+        ...T......
+        .T....#...
+        .........#
+        ..#.......
+        ..........
+        ...#......
+        ..........
+        ....#.....
+        ..........
+    """.trimIndent().lines()
+
     private val solution = Day08Solution()
 
     @Test
@@ -155,6 +168,25 @@ class Day08SolutionTest {
     }
 
     @Test
+    fun `findAntinodesBetweenWithResonantHarmonics should return antinodes in line until the bounds of the map are reached`() {
+        val input = """
+            T.........
+            ...T......
+            ......#...
+            .........#
+        """.trimIndent().lines()
+        val bounds = Bounds(input)
+
+        val tFrequencyAntennae = bounds.filter { input[it] == 'T' }
+        assert(tFrequencyAntennae.size == 2) { "precondition" }
+        val expectedResult = bounds.filter { input[it] in setOf('T', '#') }.toSet()
+
+        val result: Set<Point> = findAntinodesBetweenWithResonantHarmonics(tFrequencyAntennae[0], tFrequencyAntennae[1], bounds)
+
+        assert(result == expectedResult)
+    }
+
+    @Test
     fun `findAntinodesBetween should return antinodes within the bounds of the grid when the x and y differences between the points have different sign`() {
         val input = """
             ..........
@@ -207,7 +239,25 @@ class Day08SolutionTest {
     }
 
     @Test
-    fun `part1 should return the count of unique locations that return an antinode`() {
+    fun `findAntinodes should return all antinodes between any two members of the set with part2 semantics`() {
+        val input = sampleInputPart2
+        val bounds = Bounds(input)
+
+        val tLocations = parseAntennaLocations(input)['T']!!
+        val expectedResults = bounds. filter { input[it] in setOf('T', '#') }.toSet()
+
+        val results : Set<Point> = findAntinodes(tLocations, bounds, ::findAntinodesBetweenWithResonantHarmonics)
+
+        assert(results == expectedResults)
+    }
+
+    @Test
+    fun `part1 should return the count of unique antinode locations`() {
         assert(solution.part1(sampleInput) == 14L)
+    }
+
+    @Test
+    fun `part2 should return the count of unique antinode locations including resonant harmonics`() {
+        assert(solution.part2(sampleInput) == 34L)
     }
 }

@@ -11,16 +11,30 @@ class Day08Solution : LongSolution() {
         val bounds = Bounds(input)
         return parseAntennaLocations(input).values
             .flatMap { antennaLocations -> findAntinodes(antennaLocations, bounds) }
-            .toSet().size.toLong()
+            .distinct()
+            .size.toLong()
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>): Long {
+        val bounds = Bounds(input)
+        return parseAntennaLocations(input).values
+            .flatMap { antennaLocations -> findAntinodes(antennaLocations, bounds, ::findAntinodesBetweenWithResonantHarmonics) }
+            .distinct()
+            .size.toLong()
+    }
 }
 
-internal fun findAntinodes(points: Set<Point>, bounds: Bounds): Set<Point> {
+internal typealias AntennaMap = Map<Char, Set<Point>>
+internal typealias findAntinodesOperation = (Point, Point, Bounds) -> Set<Point>
+
+internal fun findAntinodes(
+    points: Set<Point>,
+    bounds: Bounds,
+    operation: findAntinodesOperation = ::findAntinodesBetween
+): Set<Point> {
     return points
         .generateTwoElementPairs()
-        .flatMap { (a,b) -> findAntinodesBetween(a, b, bounds) }
+        .flatMap { (a, b) -> operation(a, b, bounds) }
         .toSet()
 }
 
@@ -42,6 +56,26 @@ internal fun findAntinodesBetween(a: Point, b: Point, bounds: Bounds): Set<Point
         .toSet()
 }
 
+internal fun findAntinodesBetweenWithResonantHarmonics(a: Point, b: Point, bounds: Bounds): Set<Point> {
+    val xDifference = a.x - b.x
+    val yDifference = a.y - b.y
+
+    fun move(direction: Int) : Sequence<Point> {
+        val xIncrement = xDifference * direction
+        val yIncrement = yDifference * direction
+
+        return sequence {
+            var point = a
+            do {
+                yield(point)
+                point = Point(point.x + xIncrement, point.y + yIncrement)
+            } while (point in bounds)
+        }
+    }
+
+    return (move(1) + move(-1)).toSet()
+}
+
 internal fun <T> Set<T>.generateTwoElementPairs(): Sequence<Pair<T, T>> {
     var values = this.toList()
     return sequence {
@@ -52,8 +86,6 @@ internal fun <T> Set<T>.generateTwoElementPairs(): Sequence<Pair<T, T>> {
         }
     }
 }
-
-internal typealias AntennaMap = Map<Char, Set<Point>>
 
 internal fun parseAntennaLocations(input: List<String>): AntennaMap {
     val bounds = Bounds(input)
