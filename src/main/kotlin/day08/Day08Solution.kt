@@ -37,16 +37,10 @@ internal fun findAntinodesBetween(a: Point, b: Point, bounds: Bounds): Set<Point
     val xDifference = a.x - b.x
     val yDifference = a.y - b.y
 
-    val results = listOf(
+    return listOf(
         Point(a.x + xDifference, a.y + yDifference),
-        Point(a.x - xDifference, a.y - yDifference),
-        Point(b.x + xDifference, b.y + yDifference),
         Point(b.x - xDifference, b.y - yDifference)
     )
-
-    return results
-        .filter { it != a }
-        .filter { it != b }
         .filter { it in bounds }
         .toSet()
 }
