@@ -128,7 +128,7 @@ data class Bounds(val validXCoordinates: IntRange, val validYCoordinates: IntRan
     operator fun contains(point: Point) = point.x in validXCoordinates && point.y in validYCoordinates
 
     override fun iterator() = iterator {
-        for (x in validYCoordinates) {
+        for (x in validXCoordinates) {
             for (y in validYCoordinates) {
                 yield(Point(x, y))
             }
