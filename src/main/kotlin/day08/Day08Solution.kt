@@ -1,26 +1,26 @@
 package day08
 
 import utils.Bounds
-import utils.LongSolution
+import utils.IntSolution
 import utils.Point
 import utils.get
 
 fun main() = Day08Solution().run()
-class Day08Solution : LongSolution() {
-    override fun part1(input: List<String>): Long {
+class Day08Solution : IntSolution() {
+    override fun part1(input: List<String>): Int {
         val bounds = Bounds(input)
         return parseAntennaLocations(input).values
             .flatMap { antennaLocations -> findAntinodes(antennaLocations, bounds) }
             .distinct()
-            .size.toLong()
+            .size
     }
 
-    override fun part2(input: List<String>): Long {
+    override fun part2(input: List<String>): Int {
         val bounds = Bounds(input)
         return parseAntennaLocations(input).values
             .flatMap { antennaLocations -> findAntinodes(antennaLocations, bounds, ::findAntinodesBetweenWithResonantHarmonics) }
             .distinct()
-            .size.toLong()
+            .size
     }
 }
 

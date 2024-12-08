@@ -253,11 +253,11 @@ class Day08SolutionTest {
 
     @Test
     fun `part1 should return the count of unique antinode locations`() {
-        assert(solution.part1(sampleInput) == 14L)
+        assert(solution.part1(sampleInput) == 14)
     }
 
     @Test
     fun `part2 should return the count of unique antinode locations including resonant harmonics`() {
-        assert(solution.part2(sampleInput) == 34L)
+        assert(solution.part2(sampleInput) == 34)
     }
 }
