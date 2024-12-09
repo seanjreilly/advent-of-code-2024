@@ -7,6 +7,7 @@ import java.util.*
 class Day09SolutionTest {
     private val sampleInput = """
         2333133121414131402
+        00...111...2...333.44.5555.6666.777.888899
         """.trimIndent().lines()
 
     private val tinySampleInput = """
@@ -50,7 +51,14 @@ class Day09SolutionTest {
         }
 
         @Test
-        fun `defrag should move the ending file blocks into the earliest available free spaces`() {
+        fun `freeSpace should be in sorted order`() {
+            val diskLayout = DiskLayout(tinySampleInput.first())
+
+            assert(diskLayout.freeSpace == diskLayout.freeSpace.sorted())
+        }
+
+        @Test
+        fun `defrag should move ending file blocks into earlier available free spaces`() {
             val layout = DiskLayout(sampleInput.first())
 
             val updatedFileLayout: NavigableMap<Int, File> = layout.defrag()
@@ -62,6 +70,22 @@ class Day09SolutionTest {
                 assert(updatedFileLayout[index]!!.id == expectedFileId)
             }
 
+        }
+
+        @Test
+        fun `defragPart2 should move entire files into free space big enough to fit them`() {
+            val layout = DiskLayout(sampleInput.first())
+
+            val updatedFileLayout: NavigableMap<Int, File> = layout.defragPart2()
+
+            val expectedRawResult = "00992111777.44.333....5555.6666.....8888.."
+            val expectedResult = expectedRawResult.withIndex().filter { it.value != '.' }
+
+            assert(updatedFileLayout.size == expectedResult.size)
+            expectedResult.forEach { (index, char) ->
+                val expectedFileId = char.digitToInt()
+                assert(updatedFileLayout[index]!!.id == expectedFileId)
+            }
         }
     }
 
@@ -83,6 +107,11 @@ class Day09SolutionTest {
     @Test
     fun `part1 should return a positive number with production input`() {
         assert(solution.part1(solution.readInput()) > 0L)
+    }
+
+    @Test
+    fun `part2 should parse the disk layout, defrag the disk with the part2 approach, and return the checksum of the defragged disk`() {
+        assert(solution.part2(sampleInput) == 2858L)
     }
 
     @Test
