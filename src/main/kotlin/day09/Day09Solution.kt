@@ -38,18 +38,37 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
     }
 
     fun defragPart2(): NavigableMap<Int, File> {
-        //build a list of unmoved files by id (descending)
-        val unmovedFilesByFileId = fileLayout
-            .entries
-            .groupBy { it.value }
-            .mapValues { it.value.minOf { entry -> entry.key } }
-            .toList()
-            .map { (file, startingPosition) -> file to startingPosition }
-            .reversed()
+        val unmovedFilesByFileId = buildListOfFilesById()
+        val freeChunks = buildFreeTrunkTree()
 
-        //build a treeset of freechunks ordered by starting position
-        data class FreeChunk(val startingPosition: Int, val size: Int)
+        unmovedFilesByFileId.forEach { (file, fileStartingPosition) ->
 
+            val chunk = freeChunks
+                .firstOrNull { it.size >= file.blockSize && it.startingPosition < fileStartingPosition }
+            if (chunk == null) {
+                return@forEach
+            }
+
+            freeChunks -= chunk
+            repeat(file.blockSize) { int ->
+                fileLayout[chunk.startingPosition + int] = file
+                fileLayout.remove(fileStartingPosition + int)
+            }
+
+            //put the remaining portion of this free chunk (if any) back in the tree of free chunks
+            val remainingFreeSpace = FreeChunk(chunk.startingPosition + file.blockSize, chunk.size - file.blockSize)
+            if (remainingFreeSpace.size > 0) {
+                freeChunks.add(remainingFreeSpace)
+            }
+        }
+
+        return fileLayout
+    }
+
+    /**
+     * build a treeset of freechunks ordered by starting position
+     */
+    private fun buildFreeTrunkTree(): TreeSet<FreeChunk> {
         val freeChunkComparator: Comparator<FreeChunk> = compareBy({ it.startingPosition })
         val freeChunks = TreeSet<FreeChunk>(freeChunkComparator)
 
@@ -69,30 +88,21 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
             currentFreeChunkSize++
         }
         freeChunks.add(FreeChunk(startOfCurrentFreeChunk, currentFreeChunkSize)) //store final freeChunk
+        return freeChunks
+    }
 
-        unmovedFilesByFileId.forEach { (file, fileStartingPosition) ->
-            if (freeChunks.isEmpty()) {
-                return@forEach
-            }
-
-            val chunk = freeChunks
-                .firstOrNull { it.size >= file.blockSize && it.startingPosition < fileStartingPosition }
-            if (chunk != null) {
-                freeChunks -= chunk
-                repeat(file.blockSize) { int ->
-                    fileLayout[chunk.startingPosition + int] = file
-                    fileLayout.remove(fileStartingPosition + int)
-                }
-
-                //put the remaining portion of this free chunk (if any) back in the tree of free chunks
-                val remainingFreeSpace = FreeChunk(chunk.startingPosition + file.blockSize, chunk.size - file.blockSize)
-                if (remainingFreeSpace.size > 0) {
-                    freeChunks.add(remainingFreeSpace)
-                }
-            }
-        }
-
+    /**
+     * build a list of unmoved files by id (descending)
+     */
+    private fun buildListOfFilesById(): List<Pair<File, Int>> {
+        //the original list is sorted so we don't need to sort
         return fileLayout
+            .entries
+            .groupBy { it.value }
+            .mapValues { it.value.minOf { entry -> entry.key } }
+            .toList()
+            .map { (file, startingPosition) -> file to startingPosition }
+            .reversed()
     }
 
     companion object {
@@ -128,3 +138,4 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
 }
 
 internal data class File(val id: Int, val blockSize: Int)
+private data class FreeChunk(val startingPosition: Int, val size: Int)
