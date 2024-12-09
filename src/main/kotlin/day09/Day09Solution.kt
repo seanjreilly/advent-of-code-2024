@@ -39,7 +39,7 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
 
     fun defragPart2(): NavigableMap<Int, File> {
         val unmovedFilesByFileId = buildListOfFilesById()
-        val freeChunks = buildFreeTrunkTree()
+        val freeChunks = buildFreeChunks()
 
         unmovedFilesByFileId.forEach { (file, fileStartingPosition) ->
 
@@ -66,9 +66,9 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
     }
 
     /**
-     * build a treeset of freechunks ordered by starting position
+     * build an index of free chunks ordered by starting position
      */
-    private fun buildFreeTrunkTree(): TreeSet<FreeChunk> {
+    private fun buildFreeChunks(): TreeSet<FreeChunk> {
         val freeChunkComparator: Comparator<FreeChunk> = compareBy({ it.startingPosition })
         val freeChunks = TreeSet<FreeChunk>(freeChunkComparator)
 
