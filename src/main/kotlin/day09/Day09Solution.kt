@@ -1,13 +1,7 @@
 package day09
 
 import utils.LongSolution
-import java.util.NavigableMap
-import java.util.PriorityQueue
-import java.util.TreeMap
-import java.util.TreeSet
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
+import java.util.*
 
 fun main() = Day09Solution().run()
 class Day09Solution : LongSolution() {
