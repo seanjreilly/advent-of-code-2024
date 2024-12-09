@@ -44,20 +44,20 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
         unmovedFilesByFileId.forEach { (file, fileStartingPosition) ->
 
             val qualifyingSecondaryIndices = freeChunks
-                .filterKeys { it >= file.blockSize }
+                .tailMap(file.blockSize, true)
                 .filterValues { it.isNotEmpty() }
                 .values
             if (qualifyingSecondaryIndices.isEmpty()) {
                 return@forEach
             }
 
-            val bestSecondaryIndex: TreeSet<FreeChunk> = qualifyingSecondaryIndices.minBy { it.first().startingPosition }
-            if (bestSecondaryIndex.first().startingPosition > fileStartingPosition) {
+            val bestSecondaryIndex: PriorityQueue<FreeChunk> = qualifyingSecondaryIndices.minBy { it.first().startingPosition }
+            if (bestSecondaryIndex.peek().startingPosition > fileStartingPosition) {
                 //the earliest chunk that's big enough is to the right of the file's current position
                 return@forEach
             }
 
-            val chunk = bestSecondaryIndex.removeFirst()
+            val chunk = bestSecondaryIndex.poll()
             repeat(file.blockSize) { int ->
                 fileLayout[chunk.startingPosition + int] = file
                 fileLayout.remove(fileStartingPosition + int)
@@ -76,8 +76,8 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
     /**
      * build an index of free chunks ordered by starting position
      */
-    private fun buildFreeChunks(): HashMap<Int, TreeSet<FreeChunk>> {
-        val freeChunks = HashMap<Int, TreeSet<FreeChunk>>()
+    private fun buildFreeChunks(): TreeMap<Int, PriorityQueue<FreeChunk>> {
+        val freeChunks = TreeMap<Int, PriorityQueue<FreeChunk>>()
 
         var startOfCurrentFreeChunk = freeSpace.first()
         var lastFreeBlockProcessed = freeSpace.first()
@@ -145,8 +145,8 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
 }
 
 private val comparator: Comparator<FreeChunk> = compareBy { it.startingPosition }
-private fun HashMap<Int, TreeSet<FreeChunk>>.store(chunk: FreeChunk) {
-    val secondaryIndex = this.computeIfAbsent(chunk.size) { TreeSet<FreeChunk>(comparator) }
+private fun TreeMap<Int, PriorityQueue<FreeChunk>>.store(chunk: FreeChunk) {
+    val secondaryIndex = this.computeIfAbsent(chunk.size) { PriorityQueue<FreeChunk>(comparator) }
     secondaryIndex += chunk
 }
 
