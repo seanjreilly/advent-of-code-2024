@@ -43,13 +43,21 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
 
         unmovedFilesByFileId.forEach { (file, fileStartingPosition) ->
 
-            val chunk = freeChunks
-                .firstOrNull { it.size >= file.blockSize && it.startingPosition < fileStartingPosition }
-            if (chunk == null) {
+            val qualifyingSecondaryIndices = freeChunks
+                .filterKeys { it >= file.blockSize }
+                .filterValues { it.isNotEmpty() }
+                .values
+            if (qualifyingSecondaryIndices.isEmpty()) {
                 return@forEach
             }
 
-            freeChunks -= chunk
+            val bestSecondaryIndex: TreeSet<FreeChunk> = qualifyingSecondaryIndices.minBy { it.first().startingPosition }
+            if (bestSecondaryIndex.first().startingPosition > fileStartingPosition) {
+                //the earliest chunk that's big enough is to the right of the file's current position
+                return@forEach
+            }
+
+            val chunk = bestSecondaryIndex.removeFirst()
             repeat(file.blockSize) { int ->
                 fileLayout[chunk.startingPosition + int] = file
                 fileLayout.remove(fileStartingPosition + int)
@@ -58,7 +66,7 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
             //put the remaining portion of this free chunk (if any) back in the tree of free chunks
             val remainingFreeSpace = FreeChunk(chunk.startingPosition + file.blockSize, chunk.size - file.blockSize)
             if (remainingFreeSpace.size > 0) {
-                freeChunks.add(remainingFreeSpace)
+                freeChunks.store(remainingFreeSpace)
             }
         }
 
@@ -68,9 +76,8 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
     /**
      * build an index of free chunks ordered by starting position
      */
-    private fun buildFreeChunks(): TreeSet<FreeChunk> {
-        val freeChunkComparator: Comparator<FreeChunk> = compareBy({ it.startingPosition })
-        val freeChunks = TreeSet<FreeChunk>(freeChunkComparator)
+    private fun buildFreeChunks(): HashMap<Int, TreeSet<FreeChunk>> {
+        val freeChunks = HashMap<Int, TreeSet<FreeChunk>>()
 
         var startOfCurrentFreeChunk = freeSpace.first()
         var lastFreeBlockProcessed = freeSpace.first()
@@ -79,7 +86,7 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
         freeSpace.drop(1).forEach {
             if (it > lastFreeBlockProcessed + 1) {
                 // store the last block and add a new one
-                freeChunks.add(FreeChunk(startOfCurrentFreeChunk, currentFreeChunkSize))
+                freeChunks.store(FreeChunk(startOfCurrentFreeChunk, currentFreeChunkSize))
 
                 startOfCurrentFreeChunk = it
                 currentFreeChunkSize = 0
@@ -87,7 +94,7 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
             lastFreeBlockProcessed = it
             currentFreeChunkSize++
         }
-        freeChunks.add(FreeChunk(startOfCurrentFreeChunk, currentFreeChunkSize)) //store final freeChunk
+        freeChunks.store(FreeChunk(startOfCurrentFreeChunk, currentFreeChunkSize)) //store final freeChunk
         return freeChunks
     }
 
@@ -135,6 +142,12 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
             return DiskLayout(TreeMap(fileLayout), freeSpace)
         }
     }
+}
+
+private val comparator: Comparator<FreeChunk> = compareBy { it.startingPosition }
+private fun HashMap<Int, TreeSet<FreeChunk>>.store(chunk: FreeChunk) {
+    val secondaryIndex = this.computeIfAbsent(chunk.size) { TreeSet<FreeChunk>(comparator) }
+    secondaryIndex += chunk
 }
 
 internal data class File(val id: Int, val blockSize: Int)
