@@ -6,7 +6,6 @@ import java.util.*
 fun main() = Day09Solution().run()
 class Day09Solution : LongSolution() {
     override fun part1(input: List<String>) = DiskLayout(input.first()).defrag().checksum()
-
     override fun part2(input: List<String>) = DiskLayout(input.first()).defragPart2().checksum()
 }
 
@@ -33,31 +32,17 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
 
     fun defragPart2(): NavigableMap<Int, File> {
         val unmovedFilesByFileId = buildListOfFilesById()
-        val freeChunks = buildFreeChunks()
+        val freeChunks = buildFreeChunksIndex()
 
         unmovedFilesByFileId.forEach { (file, fileStartingPosition) ->
+            val chunk = freeChunks.findFreeChunk(file.blockSize, fileStartingPosition) ?: return@forEach
 
-            val qualifyingSecondaryIndices = freeChunks
-                .tailMap(file.blockSize, true)
-                .filterValues { it.isNotEmpty() }
-                .values
-            if (qualifyingSecondaryIndices.isEmpty()) {
-                return@forEach
-            }
-
-            val bestSecondaryIndex: PriorityQueue<FreeChunk> = qualifyingSecondaryIndices.minBy { it.first().startingPosition }
-            if (bestSecondaryIndex.peek().startingPosition > fileStartingPosition) {
-                //the earliest chunk that's big enough is to the right of the file's current position
-                return@forEach
-            }
-
-            val chunk = bestSecondaryIndex.poll()
             repeat(file.blockSize) { int ->
                 fileLayout[chunk.startingPosition + int] = file
                 fileLayout.remove(fileStartingPosition + int)
             }
 
-            //put the remaining portion of this free chunk (if any) back in the tree of free chunks
+            //put the remaining portion of this free chunk (if any) back in the index of free chunks
             val remainingFreeSpace = FreeChunk(chunk.startingPosition + file.blockSize, chunk.size - file.blockSize)
             if (remainingFreeSpace.size > 0) {
                 freeChunks.store(remainingFreeSpace)
@@ -70,8 +55,8 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
     /**
      * build an index of free chunks ordered by starting position
      */
-    private fun buildFreeChunks(): TreeMap<Int, PriorityQueue<FreeChunk>> {
-        val freeChunks = TreeMap<Int, PriorityQueue<FreeChunk>>()
+    private fun buildFreeChunksIndex(): FreeChunkIndex {
+        val freeChunks = FreeChunkIndex()
 
         var startOfCurrentFreeChunk = freeSpace.first()
         var lastFreeBlockProcessed = freeSpace.first()
@@ -138,11 +123,35 @@ internal data class DiskLayout(val fileLayout: NavigableMap<Int, File>, val free
     }
 }
 
-private val comparator: Comparator<FreeChunk> = compareBy { it.startingPosition }
-private fun TreeMap<Int, PriorityQueue<FreeChunk>>.store(chunk: FreeChunk) {
-    val secondaryIndex = this.computeIfAbsent(chunk.size) { PriorityQueue<FreeChunk>(comparator) }
-    secondaryIndex += chunk
-}
-
 internal data class File(val id: Int, val blockSize: Int)
 private data class FreeChunk(val startingPosition: Int, val size: Int)
+private class FreeChunkIndex() {
+    private val index = TreeMap<Int, PriorityQueue<FreeChunk>>()
+
+    fun store(chunk:FreeChunk) {
+        val secondaryIndex = index.computeIfAbsent(chunk.size) { PriorityQueue<FreeChunk>(CHUNK_COMPARATOR) }
+        secondaryIndex += chunk
+    }
+
+    fun findFreeChunk(minimumBlockSize: Int, maximumStartPosition: Int): FreeChunk? {
+        val qualifyingSecondaryIndices = index
+            .tailMap(minimumBlockSize, true)
+            .filterValues { it.isNotEmpty() }
+            .values
+        if (qualifyingSecondaryIndices.isEmpty()) {
+            return null //no free space big enough
+        }
+
+        val bestSecondaryIndex: PriorityQueue<FreeChunk> = qualifyingSecondaryIndices.minBy { it.peek().startingPosition }
+        if (bestSecondaryIndex.peek().startingPosition > maximumStartPosition) {
+            return null //no free space in a good enough position
+        }
+
+        val result = bestSecondaryIndex.poll()!!
+        return result
+    }
+
+    companion object {
+        private val CHUNK_COMPARATOR: Comparator<FreeChunk> = compareBy { it.startingPosition }
+    }
+}
