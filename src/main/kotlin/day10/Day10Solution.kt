@@ -25,10 +25,7 @@ internal class TopographicMap(data : Array<Array<Int>>) : GridMap<Int>(data, Poi
 
     override fun getNeighbours(point: Point): Collection<Point> {
         val currentHeight = this[point]
-        return super.getNeighbours(point)
-            .map { point -> point to this[point] }
-            .filter { (_, newHeight) -> newHeight == currentHeight + 1 }
-            .map { (point, _) -> point }
+        return super.getNeighbours(point).filter {  this[it] == currentHeight + 1 }
     }
 
     internal fun findTrailheads() = this.filter { this[it] == 0 }
