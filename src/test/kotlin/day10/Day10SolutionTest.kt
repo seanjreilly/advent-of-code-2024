@@ -66,7 +66,43 @@ class Day10SolutionTest {
             assert(map.countReachableNines(Point(2,0)) == 5)
             assert(map.countReachableNines(Point(4,0)) == 6)
         }
-        
+
+        @Test
+        fun `getRating should return 1 given a point with height 9`() {
+            val map = TopographicMap(smallSampleInput)
+
+            assert(map.getRating(Point(0,3)) == 1)
+        }
+
+        @Test
+        fun `getRating should return 1 given a point next to a single 9 with a stable slope`() {
+            val map = TopographicMap(smallSampleInput)
+
+            assert(map.getRating(Point(0,2)) == 1)
+        }
+
+        @Test
+        fun `getRating should return 2 given a point with two stable slope routes to a 9`() {
+            val map = TopographicMap(smallSampleInput)
+
+            assert(map.getRating(Point(1,2)) == 2)
+        }
+
+        @Test
+        fun `getRating should work on a slightly larger example`() {
+            val map = TopographicMap(sampleInput)
+
+            assert(map.getRating(Point(2,0)) == 20)
+            assert(map.getRating(Point(4,0)) == 24)
+            assert(map.getRating(Point(4,2)) == 10)
+            assert(map.getRating(Point(6,4)) == 4)
+            assert(map.getRating(Point(2,5)) == 1)
+            assert(map.getRating(Point(5,5)) == 4)
+            assert(map.getRating(Point(0,6)) == 5)
+            assert(map.getRating(Point(6,6)) == 8)
+            assert(map.getRating(Point(1,7)) == 5)
+        }
+
         @Test
         fun `findTrailheads should return the position of every zero`() {
             val map = TopographicMap(sampleInput)
@@ -119,5 +155,9 @@ class Day10SolutionTest {
     fun `part1 should find the score of every trailhead and return the sum`() {
         assert(solution.part1(sampleInput) == 36L)
     }
-}
 
+    @Test
+    fun `part2 should find the rating of every trailhead and return the sum`() {
+        assert(solution.part2(sampleInput) == 81L)
+    }
+}

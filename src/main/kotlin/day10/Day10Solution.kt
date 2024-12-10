@@ -14,11 +14,15 @@ class Day10Solution : LongSolution() {
             .sumOf { it.toLong() }
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>): Long {
+        val map = TopographicMap(input)
+        return map.findTrailheads()
+            .map { map.getRating(it) }
+            .sumOf { it.toLong() }
+    }
 }
 
 internal class TopographicMap(data : Array<Array<Int>>) : GridMap<Int>(data, Point::getCardinalNeighbours) {
-
 
     override fun getNeighbours(point: Point): Collection<Point> {
         val currentHeight = this[point]
@@ -39,6 +43,16 @@ internal class TopographicMap(data : Array<Array<Int>>) : GridMap<Int>(data, Poi
             .filterValues { it == 9 }
             .filterKeys { point -> this[point] == 9 } //belt and braces
             .count()
+    }
+
+    /**
+     * Find the rating: the number of distinct routes to a point of height 9 from this point
+     */
+    fun getRating(point: Point) : Int {
+        return when (this[point]) {
+            9 -> 1
+            else -> getNeighbours(point).sumOf { getRating(it) }
+        }
     }
 
     companion object {
