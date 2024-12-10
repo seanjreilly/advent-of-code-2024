@@ -3,7 +3,6 @@ package day10
 import utils.GridMap
 import utils.IntSolution
 import utils.Point
-import utils.dijkstras
 
 fun main() = Day10Solution().run()
 class Day10Solution : IntSolution() {
@@ -30,26 +29,28 @@ internal class TopographicMap(data : Array<Array<Int>>) : GridMap<Int>(data, Poi
             .map { (point, _) -> point }
     }
 
-    internal fun findTrailheads(): Collection<Point> {
-        return this.filter { this[it] == 0 }
-    }
+    internal fun findTrailheads() = this.filter { this[it] == 0 }
 
-    fun countReachableNines(trailhead: Point) : Int {
-        val reachabilityMap = dijkstras(trailhead) { point -> getNeighbours(point).map { it to 1 } }
-        //items with an optimum path of length 9 should be nines
-        return reachabilityMap
-            .filterValues { it == 9 }
-            .filterKeys { point -> this[point] == 9 } //belt and braces
-            .count()
+    fun countReachableNines(trailhead: Point): Int {
+        return findUniquePathsToHeight9(trailhead)
+            .map { it.first() }
+            .distinct().size
     }
 
     /**
      * Find the rating: the number of distinct routes to a point of height 9 from this point
      */
-    fun getRating(point: Point) : Int {
+    fun getRating(trailhead: Point) = findUniquePathsToHeight9(trailhead).size
+
+    /**
+     * Finds every distinct route to a point of height 9 from this point
+     */
+    private fun findUniquePathsToHeight9(point: Point): List<List<Point>> {
         return when (this[point]) {
-            9 -> 1
-            else -> getNeighbours(point).sumOf { getRating(it) }
+            9 -> listOf(listOf(point))
+            else -> {
+                getNeighbours(point).flatMap { findUniquePathsToHeight9(it).map { result -> result + point } }
+            }
         }
     }
 
