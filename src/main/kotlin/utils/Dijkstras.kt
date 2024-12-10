@@ -2,13 +2,13 @@ package utils
 
 import java.util.*
 
-fun <N> djikstras(vararg startNodes: N, costLimit: Int = Int.MAX_VALUE, neighboursMapping: (N) -> Collection<Pair<N, Int>>) : Map<N, Int> {
+fun <N> dijkstras(vararg startNodes: N, costLimit: Int = Int.MAX_VALUE, neighboursMapping: (N) -> Collection<Pair<N, Int>>) : Map<N, Int> {
 
     val tentativeDistances = mutableMapOf<N, Int>()
     val unvisitedNodes = PriorityQueue<Pair<N, Int>>(compareBy { it.second })
 
     /*
-        Djikstra's usually features just one start node, but you can occasionally have more,
+        Dijkstra's algorithm usually features just one start node, but you can occasionally have more,
         such as when modelling nodes as point + direction and you're allowed to enter the maze
         facing whichever way you want.
      */

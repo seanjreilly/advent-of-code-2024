@@ -3,7 +3,7 @@ package day10
 import utils.GridMap
 import utils.IntSolution
 import utils.Point
-import utils.djikstras
+import utils.dijkstras
 
 fun main() = Day10Solution().run()
 class Day10Solution : IntSolution() {
@@ -35,7 +35,7 @@ internal class TopographicMap(data : Array<Array<Int>>) : GridMap<Int>(data, Poi
     }
 
     fun countReachableNines(trailhead: Point) : Int {
-        val reachabilityMap = djikstras(trailhead) { point -> getNeighbours(point).map { it to 1 } }
+        val reachabilityMap = dijkstras(trailhead) { point -> getNeighbours(point).map { it to 1 } }
         //items with an optimum path of length 9 should be nines
         return reachabilityMap
             .filterValues { it == 9 }
