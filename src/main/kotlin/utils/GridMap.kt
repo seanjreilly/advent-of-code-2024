@@ -20,3 +20,11 @@ abstract class GridMap<T>(protected val data : Array<Array<T>>, private val getN
 
     override fun iterator() = bounds.iterator()
 }
+
+fun List<String>.toCharGrid() : Array<Array<Char>> = this.map { line -> line.toCharArray().toTypedArray() }.toTypedArray()
+
+inline fun <reified T> List<String>.toGrid(transform: (Char) -> T) : Array<Array<T>> {
+    return this
+        .map { line -> line.map(transform).toTypedArray() }
+        .toTypedArray()
+}

@@ -3,6 +3,7 @@ package day10
 import utils.GridMap
 import utils.IntSolution
 import utils.Point
+import utils.toGrid
 
 fun main() = Day10Solution().run()
 class Day10Solution : IntSolution() {
@@ -20,6 +21,7 @@ class Day10Solution : IntSolution() {
 }
 
 internal class TopographicMap(data : Array<Array<Int>>) : GridMap<Int>(data, Point::getCardinalNeighbours) {
+    constructor(input: List<String>) : this(input.toGrid(Char::digitToInt))
 
     override fun getNeighbours(point: Point): Collection<Point> {
         val currentHeight = this[point]
@@ -51,15 +53,6 @@ internal class TopographicMap(data : Array<Array<Int>>) : GridMap<Int>(data, Poi
             else -> {
                 getNeighbours(point).flatMap { findUniquePathsToHeight9(it).map { result -> result + point } }
             }
-        }
-    }
-
-    companion object {
-        internal operator fun invoke(input: List<String>): TopographicMap {
-            val data = input
-                .map { line -> line.map { it.digitToInt() }.toTypedArray() }
-                .toTypedArray()
-            return TopographicMap(data)
         }
     }
 }
