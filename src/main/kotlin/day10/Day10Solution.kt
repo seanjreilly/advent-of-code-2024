@@ -1,24 +1,22 @@
 package day10
 
 import utils.GridMap
-import utils.LongSolution
+import utils.IntSolution
 import utils.Point
 import utils.djikstras
 
 fun main() = Day10Solution().run()
-class Day10Solution : LongSolution() {
-    override fun part1(input: List<String>): Long {
+class Day10Solution : IntSolution() {
+    override fun part1(input: List<String>): Int {
         val map = TopographicMap(input)
         return map.findTrailheads()
-            .map { map.countReachableNines(it) }
-            .sumOf { it.toLong() }
+            .sumOf { map.countReachableNines(it) }
     }
 
-    override fun part2(input: List<String>): Long {
+    override fun part2(input: List<String>): Int {
         val map = TopographicMap(input)
         return map.findTrailheads()
-            .map { map.getRating(it) }
-            .sumOf { it.toLong() }
+            .sumOf { map.getRating(it) }
     }
 }
 

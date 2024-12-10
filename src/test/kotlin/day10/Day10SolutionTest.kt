@@ -153,11 +153,11 @@ class Day10SolutionTest {
     
     @Test
     fun `part1 should find the score of every trailhead and return the sum`() {
-        assert(solution.part1(sampleInput) == 36L)
+        assert(solution.part1(sampleInput) == 36)
     }
 
     @Test
     fun `part2 should find the rating of every trailhead and return the sum`() {
-        assert(solution.part2(sampleInput) == 81L)
+        assert(solution.part2(sampleInput) == 81)
     }
 }
