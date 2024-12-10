@@ -11,7 +11,7 @@ abstract class GridMap<T>(protected val data : Array<Array<T>>, private val getN
 
     operator fun get(point: Point): T = data[point]
 
-    fun getNeighbours(point: Point): Collection<Point> {
+    open fun getNeighbours(point: Point): Collection<Point> {
         return getNeighboursMethod(point)
             .filter { contains(it) }
     }
