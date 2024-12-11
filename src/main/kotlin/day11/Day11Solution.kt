@@ -10,7 +10,23 @@ class Day11Solution : LongSolution() {
         return stones.size.toLong()
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>): Long {
+        var stones = input.first().toParallelStones()
+        repeat(75) { stones = stones.blink() }
+        return stones.totalCount()
+    }
+}
+
+internal data class ParallelStones(val stoneCounts: Map<Stone, Long>) {
+    fun blink() : ParallelStones {
+        val newStoneCounts = stoneCounts.entries
+            .flatMap { entry -> entry.key.blink().map { it to entry.value } }
+            .groupBy({ it.first }, { it.second })
+            .mapValues { entry -> entry.value.sum() }
+        return ParallelStones(newStoneCounts)
+    }
+
+    fun totalCount() = stoneCounts.values.sum()
 }
 
 internal data class Stone(val value: Long, private val stringValue: String = value.toString()) {
@@ -24,6 +40,8 @@ internal data class Stone(val value: Long, private val stringValue: String = val
 }
 
 internal fun List<Stone>.blink() = this.flatMap { it.blink() }
+
+internal fun String.toParallelStones() = ParallelStones(this.toStones().associate { it to 1L })
 
 internal fun String.toStones() = this.split(' ').map { it.toLong() }.map {  Stone(it) }
 internal fun String.isEvenLength() = this.length % 2 == 0

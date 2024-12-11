@@ -8,6 +8,8 @@ class Day11SolutionTest {
         0 1 10 99 999
         """.trimIndent().lines()
 
+    private val smallSampleInput = "125 17"
+
     private val solution = Day11Solution()
 
     @Test
@@ -21,6 +23,19 @@ class Day11SolutionTest {
         )
 
         assert(sampleInput.first().toStones() == expectedResult)
+    }
+
+    @Test
+    fun `String dot toParallelStones() should return a ParallelStone instance`() {
+        val expectedResult = ParallelStones(mapOf(
+            Stone(0) to 1,
+            Stone(1) to 1,
+            Stone(10) to 1,
+            Stone(99) to 1,
+            Stone(999) to 1
+        ))
+
+        assert(sampleInput.first().toParallelStones() == expectedResult)
     }
 
     @Test
@@ -63,10 +78,43 @@ class Day11SolutionTest {
             assert(Stone(1).blink() == listOf(Stone(2024)))
         }
     }
-    
+
+    @Nested
+    inner class ParallelStoneTest {
+        @Test
+        fun `blink() should blink every Stone, updating counts`() {
+            val expectedResult = ParallelStones(mapOf(
+                Stone(1) to 2L,
+                Stone(2024) to 1L,
+                Stone(0) to 1L,
+                Stone(9) to 2L,
+                Stone(2021976) to 1L
+            ))
+            val stones = sampleInput.first().toParallelStones()
+            val result = stones.blink()
+
+            assert(result == expectedResult)
+        }
+
+        @Test
+        fun `blinking 25 times should return an expected result`() {
+            var stones = smallSampleInput.toParallelStones()
+            repeat(25) { stones = stones.blink() }
+            assert(stones.totalCount() == 55312L)
+        }
+
+        @Test
+        fun `totalCount should return the total count of stones`() {
+            val stones = sampleInput.first().toParallelStones()
+
+            assert(stones.totalCount() == 5L)
+            assert(stones.blink().totalCount() == 7L)
+        }
+    }
+
     @Test
     fun `blinking six times should return the correct number of stones`() {
-        var stones = "125 17".toStones()
+        var stones = smallSampleInput.toStones()
         val expectedResult = 22
         repeat(6) { stones = stones.blink() }
 
@@ -75,6 +123,13 @@ class Day11SolutionTest {
     
     @Test
     fun `part1 should blink the stones 25 times and return the number of stones`() {
-        assert(solution.part1(listOf("125 17")) == 55312L)
+        assert(solution.part1(listOf(smallSampleInput)) == 55312L)
+    }
+
+    @Test
+    fun `part2 should blink the stones 75 times and return the number of stones`() {
+        // calculated this using the solution itself, but it yields the correct answer
+        val expectedResult = 65601038650482L
+        assert(solution.part2(listOf(smallSampleInput)) == expectedResult)
     }
 }
