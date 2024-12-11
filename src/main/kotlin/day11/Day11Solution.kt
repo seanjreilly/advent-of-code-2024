@@ -4,15 +4,12 @@ import utils.LongSolution
 
 fun main() = Day11Solution().run()
 class Day11Solution : LongSolution() {
-    override fun part1(input: List<String>): Long {
-        var stones = input.first().toStones()
-        repeat(25) { stones = stones.blink() }
-        return stones.size.toLong()
-    }
+    override fun part1(input: List<String>) = solve(input, 25)
+    override fun part2(input: List<String>) = solve(input, 75)
 
-    override fun part2(input: List<String>): Long {
+    private fun solve(input: List<String>, times: Int): Long {
         var stones = input.first().toParallelStones()
-        repeat(75) { stones = stones.blink() }
+        repeat(times) { stones = stones.blink() }
         return stones.totalCount()
     }
 }
