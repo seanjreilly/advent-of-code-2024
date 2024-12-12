@@ -3,19 +3,14 @@ package day12
 import utils.Bounds
 import utils.CardinalDirection
 import utils.CardinalDirection.*
-import utils.LongSolution
+import utils.IntSolution
 import utils.Point
 import utils.get
 
 fun main() = Day12Solution().run()
-class Day12Solution : LongSolution() {
-    override fun part1(input: List<String>): Long {
-        return findRegions(input).sumOf { it.fencePrice().toLong() }
-    }
-
-    override fun part2(input: List<String>): Long {
-        return findRegions(input).sumOf { it.fencePricePart2().toLong() }
-    }
+class Day12Solution : IntSolution() {
+    override fun part1(input: List<String>) = findRegions(input).sumOf { it.fencePrice() }
+    override fun part2(input: List<String>) = findRegions(input).sumOf { it.fencePricePart2() }
 }
 
 typealias Plot = Point

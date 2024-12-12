@@ -218,12 +218,12 @@ class Day12SolutionTest {
 
     @Test
     fun `part1 should find all of the regions and return the sum of their fence prices`() {
-        assert(solution.part1(largeSampleInput) == 1930L)
+        assert(solution.part1(largeSampleInput) == 1930)
     }
     
     @Test
     fun `part2 should find all of the regions and return the sum of their part 2 fence prices`() {
-        assert(solution.part2(largeSampleInput) == 1206L)
+        assert(solution.part2(largeSampleInput) == 1206)
     }
 
     private fun findRegionInSampleInput(plantType: Char, map: List<String> = smallSampleInput): Region {
