@@ -22,7 +22,11 @@ data class Point(val x: Int, val y: Int) {
     }
 
     fun getCardinalAndDiagonalNeighbours() : Collection<Point> {
-        return getCardinalNeighbours() + listOf(
+        return getCardinalNeighbours() + getDiagonalNeighbours()
+    }
+
+    fun getDiagonalNeighbours() : Collection<Point> {
+        return listOf(
             northEast(),
             northWest(),
             southEast(),

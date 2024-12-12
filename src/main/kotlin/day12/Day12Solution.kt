@@ -1,6 +1,8 @@
 package day12
 
 import utils.Bounds
+import utils.CardinalDirection
+import utils.CardinalDirection.*
 import utils.LongSolution
 import utils.Point
 import utils.get
@@ -11,7 +13,9 @@ class Day12Solution : LongSolution() {
         return findRegions(input).sumOf { it.fencePrice().toLong() }
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>): Long {
+        return findRegions(input).sumOf { it.fencePricePart2().toLong() }
+    }
 }
 
 typealias Plot = Point
@@ -33,6 +37,109 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
     fun perimeter() = plots.sumOf { 4 - neighboursInRegion(it) }
     fun neighboursInRegion(plot: Plot) = plot.getCardinalNeighbours().filter { it in plots }.size
     fun fencePrice() = area * perimeter()
+
+
+    fun fencePricePart2() : Int {
+        return sides() * area
+    }
+
+    fun sides() : Int {
+
+        val directionToBorder = mapOf(
+            North to Border.Top,
+            East to Border.Right,
+            South to Border.Bottom,
+            West to Border.Left
+        )
+
+        val sideSegments = plots
+            .flatMap { plot ->
+                CardinalDirection.entries
+                    .filter { direction -> plot.move(direction) !in plots }
+                    .map { direction -> directionToBorder[direction]!! }
+                    .map { border -> SideSegment(plot, border)  }
+            }
+            .toSet()
+
+        val distinctHorizontalEdges = sideSegments.groupBy { segment -> segment.plot.y }
+            .values
+            .sumOf { segmentsInRow ->
+                val topEdgesInRow = segmentsInRow
+                    .filter { segment -> segment.border == Border.Top }
+                    .map { it.plot.x }
+                    .sorted()
+
+                val distinctTopEdgesInRow = if (topEdgesInRow.size == 0) {
+                    0
+                } else {
+                    topEdgesInRow
+                        .windowed(2)
+                        .count { (first, second) -> second > first + 1 } + 1
+                }
+
+                val bottomEdgesInRow = segmentsInRow
+                    .filter { segment -> segment.border == Border.Bottom }
+                    .map { it.plot.x }
+                    .sorted()
+
+                val distinctBottomEdgesInRow = if (bottomEdgesInRow.size == 0) {
+                    0
+                } else {
+                    bottomEdgesInRow
+                        .windowed(2)
+                        .count { (first, second) -> second > first + 1 } + 1
+                }
+
+                distinctTopEdgesInRow + distinctBottomEdgesInRow
+            }
+
+        val distinctVerticalEdges = sideSegments.groupBy { segment -> segment.plot.x }
+            .values
+            .sumOf { segmentsInColumn ->
+                val leftEdgesInColumn = segmentsInColumn
+                    .filter { segment -> segment.border == Border.Left }
+                    .map { it.plot.y }
+                    .sorted()
+                val distinctLeftEdgesInColumn = if(leftEdgesInColumn.size == 0) {
+                    0
+                } else {
+                    leftEdgesInColumn
+                        .windowed(2)
+                        .count { (first, second) -> second > first + 1 } + 1
+                }
+
+                val rightEdgesInColumn = segmentsInColumn
+                    .filter { segment -> segment.border == Border.Right }
+                    .map { it.plot.y }
+                    .sorted()
+
+                val distinctRightEdgesInColumn = if (rightEdgesInColumn.size == 0) {
+                    0
+                } else {
+                    rightEdgesInColumn
+                        .windowed(2)
+                        .count { (first, second) -> second > first + 1 } + 1
+                }
+
+                distinctLeftEdgesInColumn + distinctRightEdgesInColumn
+            }
+
+        return distinctVerticalEdges + distinctHorizontalEdges
+    }
+}
+
+private data class SideSegment(val plot: Plot, val border: Border)
+
+enum class Border() {
+    Top,
+    Bottom,
+    Left,
+    Right
+}
+
+internal fun areCollinear(first: Point, middle: Point, last: Point): Boolean {
+    return ((first.x == middle.x) && (middle.x == last.x)) ||
+        ((first.y == middle.y) && (middle.y == last.y))
 }
 
 internal fun findRegions(map: List<String>): Collection<Region> {

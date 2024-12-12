@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import utils.Bounds
+import utils.Point
 import utils.get
 
 class Day12SolutionTest {
@@ -33,6 +34,14 @@ class Day12SolutionTest {
         MIIIIIJJEE
         MIIISIJEEE
         MMMISSJEEE
+    """.trimIndent().lines()
+
+    private val eShapedSampleInput = """
+        EEEEE
+        EXXXX
+        EEEEE
+        EXXXX
+        EEEEE
     """.trimIndent().lines()
 
     private val solution = Day12Solution()
@@ -111,6 +120,63 @@ class Day12SolutionTest {
 
             assert(findRegionInSampleInput('R', largeSampleInput).fencePrice() == 216)
         }
+
+        @Test
+        fun `sides should return 4 given region with a single plot`() {
+            assert(findRegionInSampleInput('D').sides() == 4)
+        }
+
+        @Test
+        fun `sides should return 4 sides given region A in the small input`() {
+            assert(findRegionInSampleInput('A').sides() == 4)
+        }
+
+        @Test
+        fun `sides should return 4 sides given region B in the small input`() {
+            assert(findRegionInSampleInput('B').sides() == 4)
+        }
+
+        @Test
+        fun `sides should return 8 sides given region C in the small input`() {
+            assert(findRegionInSampleInput('C').sides() == 8)
+        }
+
+        @Test
+        fun `sides should return 4 sides given region D in the small input`() {
+            assert(findRegionInSampleInput('D').sides() == 4)
+        }
+
+        @Test
+        fun `sides should return 4 sides given region E in the small input`() {
+            assert(findRegionInSampleInput('E').sides() == 4)
+        }
+
+        @Test
+        fun `sides should return 12 for an E-shaped region`() {
+            val eRegion = findRegionInSampleInput('E', eShapedSampleInput)
+            assert(eRegion.sides() == 12)
+        }
+
+        @Test
+        fun `sides should return 20 for a square region with 4 square holes`() {
+            val region = findRegionInSampleInput('O', mediumSampleInput)
+            assert(region.sides() == 20)
+        }
+
+        @Test
+        fun `fencePricePart2 should return the area times the perimeter`() {
+            assert(findRegionInSampleInput('A').fencePricePart2() == 16)
+            assert(findRegionInSampleInput('B').fencePricePart2() == 16)
+            assert(findRegionInSampleInput('C').fencePricePart2() == 32)
+            assert(findRegionInSampleInput('D').fencePricePart2() == 4)
+            assert(findRegionInSampleInput('E').fencePricePart2() == 12)
+
+            //assert(findRegionInSampleInput('O', mediumSampleInput).fencePricePart2() == 428)
+
+            assert(findRegionInSampleInput('R', largeSampleInput).fencePricePart2() == 120)
+
+            assert(findRegionInSampleInput('E', eShapedSampleInput).fencePricePart2() == 204)
+        }
     }
 
     @Test
@@ -152,8 +218,29 @@ class Day12SolutionTest {
     }
 
     @Test
+    fun `areCollinear should return true given three collinear points`() {
+        assert(areCollinear(Point(0, 0), Point(1, 0), Point(2, 0)))
+        assert(areCollinear(Point(0, 0), Point(0, 1), Point(0, 2)))
+    }
+
+    @Test
+    fun `areCollinear should return false given three diagonal points`() {
+        assert(!areCollinear(Point(0, 0), Point(1, 1), Point(2, 2)))
+    }
+
+    @Test
+    fun `areCollinear should return false given three points on a corner`() {
+        assert(!areCollinear(Point(0, 0), Point(0, 1), Point(1, 1)))
+    }
+
+    @Test
     fun `part1 should find all of the regions and return the sum of their fence prices`() {
         assert(solution.part1(largeSampleInput) == 1930L)
+    }
+    
+    @Test
+    fun `part2 should find all of the regions and return the sum of their part 2 fence prices`() {
+        assert(solution.part2(largeSampleInput) == 1206L)
     }
 
     private fun findRegionInSampleInput(plantType: Char, map: List<String> = smallSampleInput): Region {
