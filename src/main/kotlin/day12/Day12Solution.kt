@@ -52,31 +52,20 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
         val distinctHorizontalEdges = sideSegments.groupBy { segment -> segment.plot.y }
             .values
             .sumOf { segmentsInRow ->
-                val topEdgesInRow = segmentsInRow
+
+                val distinctTopEdgesInRow = segmentsInRow
                     .filter { segment -> segment.border == North }
                     .map { it.plot.x }
                     .sorted()
+                    .windowed(2, partialWindows = true)
+                    .count { list -> list.size == 1 || list.reduceRight { first, second -> second - first } > 1 }
 
-                val distinctTopEdgesInRow = if (topEdgesInRow.size == 0) {
-                    0
-                } else {
-                    topEdgesInRow
-                        .windowed(2)
-                        .count { (first, second) -> second > first + 1 } + 1
-                }
-
-                val bottomEdgesInRow = segmentsInRow
+                val distinctBottomEdgesInRow = segmentsInRow
                     .filter { segment -> segment.border == South }
                     .map { it.plot.x }
                     .sorted()
-
-                val distinctBottomEdgesInRow = if (bottomEdgesInRow.size == 0) {
-                    0
-                } else {
-                    bottomEdgesInRow
-                        .windowed(2)
-                        .count { (first, second) -> second > first + 1 } + 1
-                }
+                    .windowed(2, partialWindows = true)
+                    .count { list -> list.size == 1 || list.reduceRight { first, second -> second - first } > 1 }
 
                 distinctTopEdgesInRow + distinctBottomEdgesInRow
             }
@@ -84,30 +73,21 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
         val distinctVerticalEdges = sideSegments.groupBy { segment -> segment.plot.x }
             .values
             .sumOf { segmentsInColumn ->
-                val leftEdgesInColumn = segmentsInColumn
+
+                val distinctLeftEdgesInColumn = segmentsInColumn
                     .filter { segment -> segment.border == East }
                     .map { it.plot.y }
                     .sorted()
-                val distinctLeftEdgesInColumn = if(leftEdgesInColumn.size == 0) {
-                    0
-                } else {
-                    leftEdgesInColumn
-                        .windowed(2)
-                        .count { (first, second) -> second > first + 1 } + 1
-                }
+                    .windowed(2, partialWindows = true)
+                    .count { list -> list.size == 1 || list.reduceRight { first, second -> second - first } > 1 }
 
-                val rightEdgesInColumn = segmentsInColumn
+
+                val distinctRightEdgesInColumn = segmentsInColumn
                     .filter { segment -> segment.border == West }
                     .map { it.plot.y }
                     .sorted()
-
-                val distinctRightEdgesInColumn = if (rightEdgesInColumn.size == 0) {
-                    0
-                } else {
-                    rightEdgesInColumn
-                        .windowed(2)
-                        .count { (first, second) -> second > first + 1 } + 1
-                }
+                    .windowed(2, partialWindows = true)
+                    .count { list -> list.size == 1 || list.reduceRight { first, second -> second - first } > 1 }
 
                 distinctLeftEdgesInColumn + distinctRightEdgesInColumn
             }
