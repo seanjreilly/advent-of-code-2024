@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import utils.Bounds
-import utils.Point
 import utils.get
 
 class Day12SolutionTest {
@@ -171,7 +170,7 @@ class Day12SolutionTest {
             assert(findRegionInSampleInput('D').fencePricePart2() == 4)
             assert(findRegionInSampleInput('E').fencePricePart2() == 12)
 
-            //assert(findRegionInSampleInput('O', mediumSampleInput).fencePricePart2() == 428)
+            assert(findRegionInSampleInput('O', mediumSampleInput).fencePricePart2() == 420)
 
             assert(findRegionInSampleInput('R', largeSampleInput).fencePricePart2() == 120)
 
@@ -215,22 +214,6 @@ class Day12SolutionTest {
     fun `findRegions should return 11 regions given large sample input`() {
         val result = findRegions(largeSampleInput)
         assert(result.size == 11)
-    }
-
-    @Test
-    fun `areCollinear should return true given three collinear points`() {
-        assert(areCollinear(Point(0, 0), Point(1, 0), Point(2, 0)))
-        assert(areCollinear(Point(0, 0), Point(0, 1), Point(0, 2)))
-    }
-
-    @Test
-    fun `areCollinear should return false given three diagonal points`() {
-        assert(!areCollinear(Point(0, 0), Point(1, 1), Point(2, 2)))
-    }
-
-    @Test
-    fun `areCollinear should return false given three points on a corner`() {
-        assert(!areCollinear(Point(0, 0), Point(0, 1), Point(1, 1)))
     }
 
     @Test

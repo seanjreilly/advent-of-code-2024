@@ -37,11 +37,7 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
     fun perimeter() = plots.sumOf { 4 - neighboursInRegion(it) }
     fun neighboursInRegion(plot: Plot) = plot.getCardinalNeighbours().filter { it in plots }.size
     fun fencePrice() = area * perimeter()
-
-
-    fun fencePricePart2() : Int {
-        return sides() * area
-    }
+    fun fencePricePart2() = sides() * area
 
     fun sides() : Int {
 
@@ -135,11 +131,6 @@ enum class Border() {
     Bottom,
     Left,
     Right
-}
-
-internal fun areCollinear(first: Point, middle: Point, last: Point): Boolean {
-    return ((first.x == middle.x) && (middle.x == last.x)) ||
-        ((first.y == middle.y) && (middle.y == last.y))
 }
 
 internal fun findRegions(map: List<String>): Collection<Region> {
