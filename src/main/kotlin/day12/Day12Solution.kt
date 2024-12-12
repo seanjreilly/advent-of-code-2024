@@ -41,19 +41,11 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
 
     fun sides() : Int {
 
-        val directionToBorder = mapOf(
-            North to Border.Top,
-            East to Border.Right,
-            South to Border.Bottom,
-            West to Border.Left
-        )
-
         val sideSegments = plots
             .flatMap { plot ->
                 CardinalDirection.entries
                     .filter { direction -> plot.move(direction) !in plots }
-                    .map { direction -> directionToBorder[direction]!! }
-                    .map { border -> SideSegment(plot, border)  }
+                    .map { direction -> SideSegment(plot, direction)  }
             }
             .toSet()
 
@@ -61,7 +53,7 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
             .values
             .sumOf { segmentsInRow ->
                 val topEdgesInRow = segmentsInRow
-                    .filter { segment -> segment.border == Border.Top }
+                    .filter { segment -> segment.border == North }
                     .map { it.plot.x }
                     .sorted()
 
@@ -74,7 +66,7 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
                 }
 
                 val bottomEdgesInRow = segmentsInRow
-                    .filter { segment -> segment.border == Border.Bottom }
+                    .filter { segment -> segment.border == South }
                     .map { it.plot.x }
                     .sorted()
 
@@ -93,7 +85,7 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
             .values
             .sumOf { segmentsInColumn ->
                 val leftEdgesInColumn = segmentsInColumn
-                    .filter { segment -> segment.border == Border.Left }
+                    .filter { segment -> segment.border == East }
                     .map { it.plot.y }
                     .sorted()
                 val distinctLeftEdgesInColumn = if(leftEdgesInColumn.size == 0) {
@@ -105,7 +97,7 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
                 }
 
                 val rightEdgesInColumn = segmentsInColumn
-                    .filter { segment -> segment.border == Border.Right }
+                    .filter { segment -> segment.border == West }
                     .map { it.plot.y }
                     .sorted()
 
@@ -122,15 +114,6 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
 
         return distinctVerticalEdges + distinctHorizontalEdges
     }
-}
-
-private data class SideSegment(val plot: Plot, val border: Border)
-
-enum class Border() {
-    Top,
-    Bottom,
-    Left,
-    Right
 }
 
 internal fun findRegions(map: List<String>): Collection<Region> {
@@ -162,3 +145,5 @@ internal fun findRegions(map: List<String>): Collection<Region> {
             }
         }
 }
+
+private data class SideSegment(val plot: Plot, val border: CardinalDirection)
