@@ -26,10 +26,7 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
         when (plots.size) {
             0 -> throw IllegalArgumentException("A region must contain at least one plot")
             1 -> true //a single plot is automatically contiguous
-            else -> require(
-                plots.all { plot -> plot.getCardinalNeighbours().any { it in plots } },
-                { "Plots in a region must be contiguous" }
-            )
+            else -> require(plots.all { plot -> plot.getCardinalNeighbours().any { it in plots } }) { "Plots in a region must be contiguous" }
         }
     }
 
@@ -49,49 +46,31 @@ internal data class Region(val plantType: Char, val plots: Set<Plot>) {
             }
             .toSet()
 
-        val distinctHorizontalEdges = sideSegments.groupBy { segment -> segment.plot.y }
-            .values
-            .sumOf { segmentsInRow ->
-
-                val distinctTopEdgesInRow = segmentsInRow
-                    .filter { segment -> segment.border == North }
-                    .map { it.plot.x }
+        fun countUniqueEdges(
+            segmentsInRowOrColumn: List<SideSegment>,
+            vararg directions: CardinalDirection,
+            transform: (SideSegment) -> Int
+        ): Int {
+            return directions.sumOf { direction ->
+                segmentsInRowOrColumn
+                    .filter { it.border == direction }
+                    .map(transform)
                     .sorted()
                     .windowed(2, partialWindows = true)
                     .count { list -> list.size == 1 || list.reduceRight { first, second -> second - first } > 1 }
-
-                val distinctBottomEdgesInRow = segmentsInRow
-                    .filter { segment -> segment.border == South }
-                    .map { it.plot.x }
-                    .sorted()
-                    .windowed(2, partialWindows = true)
-                    .count { list -> list.size == 1 || list.reduceRight { first, second -> second - first } > 1 }
-
-                distinctTopEdgesInRow + distinctBottomEdgesInRow
+                //a partial window means there was only one side segment in this row/column. That's a unique side.
             }
+        }
 
-        val distinctVerticalEdges = sideSegments.groupBy { segment -> segment.plot.x }
+        val distinctHorizontalEdges = sideSegments
+            .groupBy { it.plot.y }
             .values
-            .sumOf { segmentsInColumn ->
+            .sumOf { segmentsInRow -> countUniqueEdges(segmentsInRow, North, South) { it.plot.x } }
 
-                val distinctLeftEdgesInColumn = segmentsInColumn
-                    .filter { segment -> segment.border == East }
-                    .map { it.plot.y }
-                    .sorted()
-                    .windowed(2, partialWindows = true)
-                    .count { list -> list.size == 1 || list.reduceRight { first, second -> second - first } > 1 }
-
-
-                val distinctRightEdgesInColumn = segmentsInColumn
-                    .filter { segment -> segment.border == West }
-                    .map { it.plot.y }
-                    .sorted()
-                    .windowed(2, partialWindows = true)
-                    .count { list -> list.size == 1 || list.reduceRight { first, second -> second - first } > 1 }
-
-                distinctLeftEdgesInColumn + distinctRightEdgesInColumn
-            }
-
+        val distinctVerticalEdges = sideSegments
+            .groupBy { it.plot.x }
+            .values
+            .sumOf { segmentsInColumn -> countUniqueEdges(segmentsInColumn, East, West) { it.plot.y } }
         return distinctVerticalEdges + distinctHorizontalEdges
     }
 }
