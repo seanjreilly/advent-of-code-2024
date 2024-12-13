@@ -2,6 +2,8 @@ package day13
 
 import utils.LongSolution
 
+const val PART2_CRAZY_FACTOR = 10000000000000L
+
 fun main() = Day13Solution().run()
 class Day13Solution : LongSolution() {
     override fun part1(input: List<String>): Long {
@@ -30,29 +32,7 @@ internal data class ClawMachine(val prize: Prize, val buttonA: Button, val butto
     fun findWaysToWin() : Collection<WayToWin> {
         return (0 until 100L)
             .map { aPresses ->
-                val xValue = buttonA.dX * aPresses
-                val yValue = buttonA.dY * aPresses
-
-                if (xValue > prize.x) {
-                    return@map null
-                }
-                if (yValue > prize.y) {
-                    return@map null
-                }
-
-                val remainingX = prize.x - xValue
-                val remainingY = prize.y - yValue
-
-                if (remainingX % buttonB.dX != 0L) {
-                    return@map null
-                }
-
-                val bPresses = remainingX / buttonB.dX
-
-                //validate
-                if (buttonB.dY * bPresses != remainingY) {
-                    return@map null
-                }
+                val bPresses = findBPresses(aPresses, prize, buttonA, buttonB) ?: return@map null
                 WayToWin(aPresses, bPresses)
             }
             .filterNotNull()
@@ -78,6 +58,34 @@ internal data class ClawMachine(val prize: Prize, val buttonA: Button, val butto
             return Prize(x, y)
         }
     }
+}
+
+internal fun findBPresses(aPresses: Long, thePrize: Prize, buttonA: Button, buttonB: Button) : Long? {
+    val xValue = buttonA.dX * aPresses
+    val yValue = buttonA.dY * aPresses
+
+    if (xValue > thePrize.x) {
+        return null
+    }
+    if (yValue > thePrize.y) {
+        return null
+    }
+
+    val remainingX = thePrize.x - xValue
+    val remainingY = thePrize.y - yValue
+
+    if (remainingX % buttonB.dX != 0L) {
+        return null
+    }
+
+    val bPresses = remainingX / buttonB.dX
+
+    //validate
+    if (buttonB.dY * bPresses != remainingY) {
+        return null
+    }
+
+    return bPresses
 }
 
 internal data class WayToWin(val buttonAPresses: Long, val buttonBPresses: Long) {

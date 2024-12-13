@@ -79,6 +79,11 @@ class Day13SolutionTest {
             assert(clawMachines[1].findWaysToWin().isEmpty())
             assert(clawMachines[3].findWaysToWin().isEmpty())
         }
+        
+        @Test
+        fun `toPart2 `() {
+            
+        }
     }
 
     @Test
