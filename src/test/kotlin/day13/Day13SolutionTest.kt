@@ -92,7 +92,7 @@ class Day13SolutionTest {
         fun `cost should return 3 times aPresses plus bPresses`() {
             val wayToWin = WayToWin(80, 40)
 
-            assert(wayToWin.cost == 280)
+            assert(wayToWin.cost == 280L)
         }
     }
 }

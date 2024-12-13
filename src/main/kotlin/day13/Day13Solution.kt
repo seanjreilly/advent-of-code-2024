@@ -8,8 +8,7 @@ class Day13Solution : LongSolution() {
         return parseClawMachines(input)
             .map { machine -> machine.findWaysToWin().sortedBy { it.cost } }
             .filter { it.isNotEmpty() }
-            .map { it.first() }
-            .sumOf { it.cost.toLong() }
+            .sumOf { it.first().cost }
     }
 
     override fun part2(input: List<String>) = 0L
@@ -29,7 +28,7 @@ internal fun parseClawMachines(input: List<String>): List<ClawMachine> {
 internal data class ClawMachine(val prize: Prize, val buttonA: Button, val buttonB: Button) {
 
     fun findWaysToWin() : Collection<WayToWin> {
-        return (0 until 100)
+        return (0 until 100L)
             .map { aPresses ->
                 val xValue = buttonA.dX * aPresses
                 val yValue = buttonA.dY * aPresses
@@ -44,7 +43,7 @@ internal data class ClawMachine(val prize: Prize, val buttonA: Button, val butto
                 val remainingX = prize.x - xValue
                 val remainingY = prize.y - yValue
 
-                if (remainingX % buttonB.dX != 0) {
+                if (remainingX % buttonB.dX != 0L) {
                     return@map null
                 }
 
@@ -71,19 +70,19 @@ internal data class ClawMachine(val prize: Prize, val buttonA: Button, val butto
         }
 
         fun parseButton(line: String) : Button {
-            val (dX,dY) = BUTTON_REGEX.matchEntire(line)!!.destructured.toList().map { it.toInt() }
+            val (dX,dY) = BUTTON_REGEX.matchEntire(line)!!.destructured.toList().map { it.toLong() }
             return Button(dX ,dY)
         }
         fun parsePrize(line: String) : Prize {
-            val (x,y) = PRIZE_REGEX.matchEntire(line)!!.destructured.toList().map { it.toInt() }
-            return Prize(x.toInt(), y.toInt())
+            val (x,y) = PRIZE_REGEX.matchEntire(line)!!.destructured.toList().map { it.toLong() }
+            return Prize(x, y)
         }
     }
 }
 
-internal data class WayToWin(val buttonAPresses: Int, val buttonBPresses: Int) {
+internal data class WayToWin(val buttonAPresses: Long, val buttonBPresses: Long) {
     val cost = (3 * buttonAPresses) + buttonBPresses
 }
 
-internal data class Prize(val x: Int, val y: Int)
-internal data class Button(val dX: Int, val dY: Int)
+internal data class Prize(val x: Long, val y: Long)
+internal data class Button(val dX: Long, val dY: Long)
