@@ -81,14 +81,47 @@ class Day13SolutionTest {
         }
         
         @Test
-        fun `toPart2 `() {
-            
-        }
-    }
+        fun `toPart2 should add a huge number to the prize`() {
+            val expectedPrize = Prize(10000000008400, 10000000005400)
+            val clawMachine = parseClawMachines(sampleInput).first()
+            val part2Machine : ClawMachine = clawMachine.toPart2()
 
-    @Test
-    fun `part1 should return the fewest number of tokens needed to win all possible prizes`() {
-        assert(solution.part1(sampleInput) == 480L)
+            assert(part2Machine.buttonA == clawMachine.buttonA)
+            assert(part2Machine.buttonB == clawMachine.buttonB)
+            assert(part2Machine.prize == expectedPrize)
+        }
+
+        @Test
+        fun `findWayToWinPart2 should not return an answer for the first machine`() {
+            val machine = parseClawMachines(sampleInput)[0].toPart2()
+            val result = machine.findWayToWinPart2()
+            assert(result == null)
+        }
+
+        @Test
+        fun `findWayToWinPart2 should return an answer for the second machine`() {
+            val machine = parseClawMachines(sampleInput)[1].toPart2()
+            val result = machine.findWayToWinPart2()
+            assert(result != null)
+            println(result)
+            println(result!!.cost)
+        }
+
+        @Test
+        fun `findWayToWinPart2 should not return an answer for the third machine`() {
+            val machine = parseClawMachines(sampleInput)[2].toPart2()
+            val result = machine.findWayToWinPart2()
+            assert(result == null)
+        }
+
+        @Test
+        fun `findWayToWinPart2 should return an answer for the last machine`() {
+            val machine = parseClawMachines(sampleInput)[3].toPart2()
+            val result = machine.findWayToWinPart2()
+            assert(result != null)
+            println(result)
+            println(result!!.cost)
+        }
     }
 
     @Nested
@@ -99,5 +132,15 @@ class Day13SolutionTest {
 
             assert(wayToWin.cost == 280L)
         }
+    }
+
+    @Test
+    fun `part1 should return the fewest number of tokens needed to win all possible prizes`() {
+        assert(solution.part1(sampleInput) == 480L)
+    }
+
+    @Test
+    fun `part2 should return the fewest number of tokens needed to win all possible part2 prizes`() {
+        assert(solution.part2(sampleInput) == 459236326669L + 416082282239L)
     }
 }

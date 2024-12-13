@@ -13,7 +13,12 @@ class Day13Solution : LongSolution() {
             .sumOf { it.first().cost }
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>) : Long {
+        return parseClawMachines(input)
+            .map { it.toPart2() }
+            .mapNotNull { machine -> machine.findWayToWinPart2() }
+            .sumOf { it.cost }
+    }
 }
 
 internal fun parseClawMachines(input: List<String>): List<ClawMachine> {
@@ -36,6 +41,37 @@ internal data class ClawMachine(val prize: Prize, val buttonA: Button, val butto
                 WayToWin(aPresses, bPresses)
             }
             .filterNotNull()
+    }
+
+    fun findWayToWinPart2() :  WayToWin? {
+        val (x0, y0) = buttonA
+        val (x1, y1) = buttonB
+
+        val bDenominator = (y0 * x1) - (x0 * y1)
+        if ((bDenominator == 0L) || (y0 == 0L)) {
+            return null
+        }
+
+        val bNumerator = (y0 * prize.x) - (x0 * prize.y)
+        val b = try {
+            bNumerator.toBigDecimal().divide(bDenominator.toBigDecimal()).toLong()
+        } catch (_: ArithmeticException) {
+            return null //this happens when there isn't an exact value for b, which means no solution
+        }
+
+        val aNumerator = prize.y - (y1 * b)
+        val a = try {
+            aNumerator.toBigDecimal().divide(y0.toBigDecimal()).toLong()
+        } catch (_: ArithmeticException) {
+            return null //this happens when there isn't an exact value for a, which means no solution
+        }
+
+        assert(findBPresses(a, prize, buttonA, buttonB) == b)
+        return WayToWin(a, b)
+    }
+
+    fun toPart2(): ClawMachine {
+        return this.copy(prize = prize + PART2_CRAZY_FACTOR)
     }
 
     companion object {
@@ -92,5 +128,7 @@ internal data class WayToWin(val buttonAPresses: Long, val buttonBPresses: Long)
     val cost = (3 * buttonAPresses) + buttonBPresses
 }
 
-internal data class Prize(val x: Long, val y: Long)
+internal data class Prize(val x: Long, val y: Long) {
+    operator fun plus(value : Long) = Prize(x + value, y + value)
+}
 internal data class Button(val dX: Long, val dY: Long)
