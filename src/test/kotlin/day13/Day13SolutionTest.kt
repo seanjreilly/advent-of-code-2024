@@ -53,31 +53,31 @@ class Day13SolutionTest {
         }
 
         @Test
-        fun `findWaysToWin should return combinations of A presses and B presses that will win the prize`() {
+        fun `findWayToWin should return the combination of A presses and B presses that will win the prize`() {
             val machine: ClawMachine = parseClawMachines(sampleInput).first()
-            val result : Collection<WayToWin> = machine.findWaysToWin()
+            val result = machine.findWayToWin()
 
             val expectedBestWayToWin = WayToWin(80, 40)
 
-            assert(expectedBestWayToWin in result)
+            assert(expectedBestWayToWin == result)
         }
 
         @Test
-        fun `findWaysToWin should return combinations of A presses and B presses that will win the prize given a different claw machine`() {
+        fun `findWayToWin should return the combination of A presses and B presses that will win the prize given a different claw machine`() {
             val machine: ClawMachine = parseClawMachines(sampleInput)[2]
-            val result : Collection<WayToWin> = machine.findWaysToWin()
+            val result = machine.findWayToWin()
 
             val expectedBestWayToWin = WayToWin(38, 86)
 
-            assert(expectedBestWayToWin in result)
+            assert(expectedBestWayToWin == result)
         }
 
         @Test
-        fun `findWaysToWin should return an empty collection if no combination of A presses and B presses will win the prize`() {
+        fun `findWayToWin should return null if no combination of A presses and B presses will win the prize`() {
             val clawMachines = parseClawMachines(sampleInput)
 
-            assert(clawMachines[1].findWaysToWin().isEmpty())
-            assert(clawMachines[3].findWaysToWin().isEmpty())
+            assert(clawMachines[1].findWayToWin() == null)
+            assert(clawMachines[3].findWayToWin() == null)
         }
         
         @Test
@@ -92,32 +92,32 @@ class Day13SolutionTest {
         }
 
         @Test
-        fun `findWayToWinPart2 should not return an answer for the first machine`() {
+        fun `findWayToWin should not return an answer for the first machine in part2`() {
             val machine = parseClawMachines(sampleInput)[0].toPart2()
-            val result = machine.findWayToWinPart2()
+            val result = machine.findWayToWin()
             assert(result == null)
         }
 
         @Test
-        fun `findWayToWinPart2 should return an answer for the second machine`() {
+        fun `findWayToWin should return an answer for the second machine in part2`() {
             val machine = parseClawMachines(sampleInput)[1].toPart2()
-            val result = machine.findWayToWinPart2()
+            val result = machine.findWayToWin()
             assert(result != null)
             println(result)
             println(result!!.cost)
         }
 
         @Test
-        fun `findWayToWinPart2 should not return an answer for the third machine`() {
+        fun `findWayToWinPart2 should not return an answer for the third machine in part2`() {
             val machine = parseClawMachines(sampleInput)[2].toPart2()
-            val result = machine.findWayToWinPart2()
+            val result = machine.findWayToWin()
             assert(result == null)
         }
 
         @Test
-        fun `findWayToWinPart2 should return an answer for the last machine`() {
+        fun `findWayToWinPart2 should return an answer for the last machine in part2`() {
             val machine = parseClawMachines(sampleInput)[3].toPart2()
-            val result = machine.findWayToWinPart2()
+            val result = machine.findWayToWin()
             assert(result != null)
             println(result)
             println(result!!.cost)

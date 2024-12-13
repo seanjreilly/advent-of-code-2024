@@ -8,15 +8,14 @@ fun main() = Day13Solution().run()
 class Day13Solution : LongSolution() {
     override fun part1(input: List<String>): Long {
         return parseClawMachines(input)
-            .map { machine -> machine.findWaysToWin().sortedBy { it.cost } }
-            .filter { it.isNotEmpty() }
-            .sumOf { it.first().cost }
+            .mapNotNull { machine -> machine.findWayToWin() }
+            .sumOf { it.cost }
     }
 
     override fun part2(input: List<String>) : Long {
         return parseClawMachines(input)
             .map { it.toPart2() }
-            .mapNotNull { machine -> machine.findWayToWinPart2() }
+            .mapNotNull { machine -> machine.findWayToWin() }
             .sumOf { it.cost }
     }
 }
@@ -34,16 +33,7 @@ internal fun parseClawMachines(input: List<String>): List<ClawMachine> {
 
 internal data class ClawMachine(val prize: Prize, val buttonA: Button, val buttonB: Button) {
 
-    fun findWaysToWin() : Collection<WayToWin> {
-        return (0 until 100L)
-            .map { aPresses ->
-                val bPresses = findBPresses(aPresses, prize, buttonA, buttonB) ?: return@map null
-                WayToWin(aPresses, bPresses)
-            }
-            .filterNotNull()
-    }
-
-    fun findWayToWinPart2() :  WayToWin? {
+    fun findWayToWin() :  WayToWin? {
         val (x0, y0) = buttonA
         val (x1, y1) = buttonB
 
