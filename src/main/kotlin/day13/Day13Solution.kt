@@ -6,18 +6,13 @@ const val PART2_CRAZY_FACTOR = 10000000000000L
 
 fun main() = Day13Solution().run()
 class Day13Solution : LongSolution() {
-    override fun part1(input: List<String>): Long {
-        return parseClawMachines(input)
-            .mapNotNull { machine -> machine.findWayToWin() }
-            .sumOf { it.cost }
-    }
+    override fun part1(input: List<String>) = solve(input) { it }
+    override fun part2(input: List<String>) = solve(input) { it.toPart2() }
 
-    override fun part2(input: List<String>) : Long {
-        return parseClawMachines(input)
-            .map { it.toPart2() }
-            .mapNotNull { machine -> machine.findWayToWin() }
-            .sumOf { it.cost }
-    }
+    private fun solve(input: List<String>, transform: (ClawMachine) -> ClawMachine): Long = parseClawMachines(input)
+        .map(transform)
+        .mapNotNull { machine -> machine.findWayToWin() }
+        .sumOf { it.cost }
 }
 
 internal fun parseClawMachines(input: List<String>): List<ClawMachine> {
