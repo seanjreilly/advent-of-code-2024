@@ -255,12 +255,12 @@ class Day14SolutionTest {
 
     @Test
     fun `part1 should parse the robots, move each one 100 times, and compute the total safety factor`() {
-        assert(solution.part1(sampleInput) == 12L)
+        assert(solution.part1(sampleInput) == 12)
     }
 
     @Test
     fun `part2 should parse the robots, move each one 7500 times, and find the round with the biggest clump of robots`() {
-        assert(solution.part2(sampleInput) == 6L)
+        assert(solution.part2(sampleInput) == 6)
     }
 
     private fun testRobot(x: Int, y: Int): Robot = Robot(Point(x, y), NOT_MOVING)

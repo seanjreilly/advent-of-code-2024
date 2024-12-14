@@ -1,21 +1,21 @@
 package day14
 
 import utils.Bounds
-import utils.LongSolution
+import utils.IntSolution
 import utils.Point
 import kotlin.math.sign
 
 internal val PROD_BOUNDS = Bounds(0 ..101, 0..103)
 
 fun main() = Day14Solution().run()
-class Day14Solution(val bounds: Bounds = PROD_BOUNDS) : LongSolution() {
-    override fun part1(input: List<String>): Long {
+class Day14Solution(val bounds: Bounds = PROD_BOUNDS) : IntSolution() {
+    override fun part1(input: List<String>): Int {
         val robots = parseRobots(input)
         repeat(100) { robots.forEach { robot -> robot.move(bounds)} }
-        return robots.safetyFactor(bounds).toLong()
+        return robots.safetyFactor(bounds)
     }
 
-    override fun part2(input: List<String>) : Long {
+    override fun part2(input: List<String>) : Int {
         val robots = parseRobots(input)
 
         fun findPositions() = robots.map { it.position }.toSet()
@@ -43,7 +43,7 @@ class Day14Solution(val bounds: Bounds = PROD_BOUNDS) : LongSolution() {
 
         println()
 
-        return bestSeconds.toLong()
+        return bestSeconds
     }
 }
 
