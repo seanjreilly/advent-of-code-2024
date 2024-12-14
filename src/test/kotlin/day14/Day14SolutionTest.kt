@@ -227,8 +227,40 @@ class Day14SolutionTest {
     }
 
     @Test
+    fun `findAdjacentPoints should return distinct regions of adjacent points`() {
+        val firstSquare = listOf(
+            Point(0,0),
+            Point(1,0),
+            Point(0,1),
+            Point(1,1),
+        )
+
+        val secondSquare = listOf(
+            Point(9,9),
+            Point(10,9),
+            Point(9,10),
+            Point(10,10),
+        )
+
+        val soloPoint = Point(5,5)
+
+        val points = (firstSquare + secondSquare + soloPoint).shuffled()
+
+        val result : Collection<AdjacentRobots> = findAdjacentRobots(points)
+
+        assert(result.size == 3)
+        assert(result.count { it.size == 1 } == 1)
+        assert(result.count { it.size == 4 } == 2)
+    }
+
+    @Test
     fun `part1 should parse the robots, move each one 100 times, and compute the total safety factor`() {
         assert(solution.part1(sampleInput) == 12L)
+    }
+
+    @Test
+    fun `part2 should parse the robots, move each one 7500 times, and find the round with the biggest clump of robots`() {
+        assert(solution.part2(sampleInput) == 6L)
     }
 
     private fun testRobot(x: Int, y: Int): Robot = Robot(Point(x, y), NOT_MOVING)

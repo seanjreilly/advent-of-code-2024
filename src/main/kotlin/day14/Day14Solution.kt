@@ -15,7 +15,36 @@ class Day14Solution(val bounds: Bounds = PROD_BOUNDS) : LongSolution() {
         return robots.safetyFactor(bounds).toLong()
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>) : Long {
+        val robots = parseRobots(input)
+
+        fun findPositions() = robots.map { it.position }.toSet()
+        fun findScore(positions: Set<Point>) = findAdjacentRobots(positions).maxOf { it.size }
+
+        var bestSeconds = 0
+        var bestPositions = findPositions()
+        var bestScore = findScore(bestPositions)
+
+        repeat(7500) { i ->
+            robots.forEach { robot -> robot.move(bounds)}
+            val positions = findPositions()
+            val score = findScore(positions)
+
+            if (score > bestScore) {
+                bestSeconds = i + 1
+                bestPositions = positions
+                bestScore = score
+            }
+        }
+
+        println("best candidate is after ${bestSeconds} seconds, with ${bestScore} adjacent positions")
+        println()
+        println(printGrid(bestPositions, bounds))
+
+        println()
+
+        return bestSeconds.toLong()
+    }
 }
 
 internal fun List<Robot>.safetyFactor(bounds: Bounds): Int {
@@ -69,3 +98,49 @@ enum class Quadrant {
 internal data class Velocity(val dX: Int, val dY: Int)
 
 internal fun parseRobots(input: List<String>) = input.map(Robot::invoke)
+
+internal data class AdjacentRobots(val size: Int)
+
+internal fun findAdjacentRobots(robotPositions: Collection<Point>): Collection<AdjacentRobots> {
+    val pointSet = robotPositions.toSet()
+    val visitedPoints = mutableSetOf<Point>()
+
+    fun exploreAdjacentRobots(firstPoint: Point) : AdjacentRobots {
+        val pointsInRegion = mutableSetOf<Point>()
+        var searchGeneration = setOf(firstPoint)
+
+        while (searchGeneration.isNotEmpty()) {
+            pointsInRegion += searchGeneration
+            visitedPoints += searchGeneration
+            searchGeneration = searchGeneration
+                .flatMap { it.getCardinalNeighbours() }
+                .filter { it !in visitedPoints } //already includes points in the region
+                .filter { it in pointSet }
+                .toSet()
+        }
+        return AdjacentRobots(pointsInRegion.size)
+    }
+
+    return robotPositions.mapNotNull {
+        when (it in visitedPoints) {
+            true -> null //we've already processed this plot
+            false -> exploreAdjacentRobots(it) //new region
+        }
+    }
+}
+
+internal fun printGrid(points: Set<Point>, bounds: Bounds) : String {
+    return bounds
+        .validYCoordinates
+        .joinToString("\n") { y ->
+            bounds.validXCoordinates
+                .map { x ->
+                    when (Point(x, y)) {
+                        in points -> '#'
+                        else -> '.'
+                    }
+                }
+                .toCharArray()
+                .joinToString("")
+        }
+}
