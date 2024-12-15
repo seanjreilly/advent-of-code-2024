@@ -127,9 +127,28 @@ internal data class Warehouse2(val robotLocation: Point, val boxLeftSideLocation
                     }
                 }
 
-                val leftSidesToRemove = visitedRightSides.map { it.copy(x= it.x -1) }
+                val leftSidesToRemove = visitedRightSides.map { it.west() }
                 val leftSidesToAdd = visitedRightSides.map { it.copy(x= it.x -2) }
                 nextRoundLeftSideLocations = (boxLeftSideLocations - leftSidesToRemove) + leftSidesToAdd
+        }
+
+        if (direction == North) {
+            val visitedLeftSides = mutableSetOf<Point>()
+            var location = potentialNewRobotLocation
+            if (location in boxRightSideLocations) {
+                location = location.west()
+            }
+            while (location in boxLeftSideLocations) {
+                visitedLeftSides += location
+                location = location.north() //x+1 is a box right side
+                if (location in wallLocations) {
+                    return this // can't move
+                }
+            }
+
+            val leftSidesToRemove = visitedLeftSides
+            val leftSidesToAdd = visitedLeftSides.map { it.north() }
+            nextRoundLeftSideLocations = (boxLeftSideLocations - leftSidesToRemove) + leftSidesToAdd
         }
 
         return this.copy(
