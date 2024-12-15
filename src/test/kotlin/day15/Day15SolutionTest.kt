@@ -1337,6 +1337,26 @@ class Day15SolutionTest {
 
             assert(finalWarehouse == expectedFinalWarehouse)
         }
+
+        @Test
+        fun `totalScore should return total score for the expected final layout`() {
+            val expectedFinalWarehouseLayout = """
+                ####################
+                ##[].......[].[][]##
+                ##[]...........[].##
+                ##[]........[][][]##
+                ##[]......[]....[]##
+                ##..##......[]....##
+                ##..[]............##
+                ##..@......[].[][]##
+                ##......[][]..[]..##
+                ####################
+            """.trimIndent().lines()
+            val finalWarehouse = Warehouse2(expectedFinalWarehouseLayout)
+            val score = finalWarehouse.totalScore()
+
+            assert(score == 9021)
+        }
     }
 
     @Nested
@@ -1362,6 +1382,11 @@ class Day15SolutionTest {
     @Test
     fun `part1 should parse the warehouse, apply all the moves and return the total score given the large sample input`() {
         assert(solution.part1(largeSampleInput) == 10092L)
+    }
+
+    @Test
+    fun `part2 should parse the doubled warehouse, apply all the moves and return the total score given the large sample input`() {
+        assert(solution.part2(largeSampleInput) == 9021L)
     }
 
     @Test

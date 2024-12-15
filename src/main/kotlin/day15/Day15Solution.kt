@@ -19,7 +19,12 @@ class Day15Solution : LongSolution() {
             .totalScore().toLong()
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>) : Long {
+        val originalWarehouse = Warehouse2(input.transformWarehouseLayout())
+        return parseMoves(input)
+            .fold(originalWarehouse) { warehouse, direction -> warehouse.moveRobot(direction) }
+            .totalScore().toLong()
+    }
 }
 
 internal fun parseMove(ch: Char): CardinalDirection {
@@ -196,6 +201,10 @@ internal data class Warehouse2(val robotLocation: Point, val boxLeftSideLocation
             robotLocation = potentialNewRobotLocation,
             boxLeftSideLocations = nextRoundLeftSideLocations
         )
+    }
+
+    fun totalScore(): Int {
+        return boxLeftSideLocations.sumOf { it.score() }
     }
 
     private fun findNeighbours(point: Point, direction: CardinalDirection) : Pair<Point, Point>? {
