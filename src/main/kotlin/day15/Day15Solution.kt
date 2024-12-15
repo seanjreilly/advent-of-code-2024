@@ -9,6 +9,7 @@ import utils.IntSolution
 import utils.Point
 import kotlin.collections.minus
 import kotlin.collections.plus
+import kotlin.collections.plusAssign
 
 fun main() = Day15Solution().run()
 class Day15Solution : IntSolution() {
@@ -120,64 +121,8 @@ internal data class Warehouse2(val robotLocation: Point, val boxLeftSideLocation
                 nextRoundLeftSideLocations = (boxLeftSideLocations - leftSidesToRemove) + leftSidesToAdd
         }
 
-        if (direction == North) {
-            if (potentialNewRobotLocation in boxLeftSideLocations || potentialNewRobotLocation in boxRightSideLocations) {
-                val visitedPoints = mutableSetOf(potentialNewRobotLocation)
-                visitedPoints += if (potentialNewRobotLocation in boxRightSideLocations) {
-                    potentialNewRobotLocation.west()
-                } else {
-                    potentialNewRobotLocation.east()
-                }
-
-                var generation: Set<Point> = visitedPoints
-                while (generation.isNotEmpty()) {
-                    visitedPoints += generation
-                    generation = generation
-                        .mapNotNull { findNeighbours(it, North) }
-                        .flatMap { pair -> pair.toList() }
-                        .toSet()
-                }
-
-                val leftSidesToRemove = visitedPoints.filter { it in boxLeftSideLocations }
-                val leftSidesToAdd = leftSidesToRemove.map { it.north() }
-                val rightSidesToAdd = visitedPoints.filter { it in boxRightSideLocations }.map { it.north() }
-                val newPoints = leftSidesToAdd + rightSidesToAdd
-                if (newPoints.any { it in wallLocations }) {
-                    return this // can't move
-                }
-
-                nextRoundLeftSideLocations = (boxLeftSideLocations - leftSidesToRemove) + leftSidesToAdd
-            }
-        }
-
-        if (direction == South) {
-            if (potentialNewRobotLocation in boxLeftSideLocations || potentialNewRobotLocation in boxRightSideLocations) {
-                val visitedPoints = mutableSetOf(potentialNewRobotLocation)
-                visitedPoints += if (potentialNewRobotLocation in boxRightSideLocations) {
-                    potentialNewRobotLocation.west()
-                } else {
-                    potentialNewRobotLocation.east()
-                }
-
-                var generation:Set<Point> = visitedPoints
-                while (generation.isNotEmpty()) {
-                    visitedPoints += generation
-                    generation = generation
-                        .mapNotNull { findNeighbours(it, South) }
-                        .flatMap { pair -> pair.toList() }
-                        .toSet()
-                }
-
-                val leftSidesToRemove = visitedPoints.filter { it in boxLeftSideLocations }
-                val leftSidesToAdd = leftSidesToRemove.map { it.south() }
-                val rightSidesToAdd = visitedPoints.filter { it in boxRightSideLocations }.map { it.south()  }
-                val newPoints = leftSidesToAdd + rightSidesToAdd
-                if (newPoints.any { it in wallLocations }) {
-                    return this // can't move
-                }
-
-                nextRoundLeftSideLocations = (boxLeftSideLocations - leftSidesToRemove) + leftSidesToAdd
-            }
+        if (direction == North || direction == South) {
+            nextRoundLeftSideLocations = pushBoxesVertically(potentialNewRobotLocation, direction) ?: return this //can't move
         }
 
         return this.copy(
@@ -188,6 +133,37 @@ internal data class Warehouse2(val robotLocation: Point, val boxLeftSideLocation
 
     fun totalScore(): Int {
         return boxLeftSideLocations.sumOf { it.score() }
+    }
+
+    private fun pushBoxesVertically(newRobotLocation: Point, direction: CardinalDirection) : Set<Point>? {
+        if (newRobotLocation in boxLeftSideLocations || newRobotLocation in boxRightSideLocations) {
+            val visitedPoints = mutableSetOf(newRobotLocation)
+            visitedPoints += if (newRobotLocation in boxRightSideLocations) {
+                newRobotLocation.west()
+            } else {
+                newRobotLocation.east()
+            }
+
+            var generation: Set<Point> = visitedPoints
+            while (generation.isNotEmpty()) {
+                visitedPoints += generation
+                generation = generation
+                    .mapNotNull { findNeighbours(it, direction) }
+                    .flatMap { pair -> pair.toList() }
+                    .toSet()
+            }
+
+            val leftSidesToRemove = visitedPoints.filter { it in boxLeftSideLocations }
+            val leftSidesToAdd = leftSidesToRemove.map { it.move(direction) }
+            val rightSidesToAdd = visitedPoints.filter { it in boxRightSideLocations }.map { it.move(direction) }
+            val newPoints = leftSidesToAdd + rightSidesToAdd
+            if (newPoints.any { it in wallLocations }) {
+                return null // can't move
+            }
+
+            return (boxLeftSideLocations - leftSidesToRemove) + leftSidesToAdd
+        }
+        return boxLeftSideLocations //didn't run into a box
     }
 
     private fun findNeighbours(point: Point, direction: CardinalDirection) : Pair<Point, Point>? {
