@@ -5,43 +5,26 @@ import utils.CardinalDirection.East
 import utils.CardinalDirection.North
 import utils.CardinalDirection.South
 import utils.CardinalDirection.West
-import utils.LongSolution
+import utils.IntSolution
 import utils.Point
 import kotlin.collections.minus
 import kotlin.collections.plus
 
 fun main() = Day15Solution().run()
-class Day15Solution : LongSolution() {
-    override fun part1(input: List<String>): Long {
+class Day15Solution : IntSolution() {
+    override fun part1(input: List<String>): Int {
         val originalWarehouse = Warehouse(input)
         return parseMoves(input)
             .fold(originalWarehouse) { warehouse, direction -> warehouse.moveRobot(direction) }
-            .totalScore().toLong()
+            .totalScore()
     }
 
-    override fun part2(input: List<String>) : Long {
+    override fun part2(input: List<String>) : Int {
         val originalWarehouse = Warehouse2(input.transformWarehouseLayout())
         return parseMoves(input)
             .fold(originalWarehouse) { warehouse, direction -> warehouse.moveRobot(direction) }
-            .totalScore().toLong()
+            .totalScore()
     }
-}
-
-internal fun parseMove(ch: Char): CardinalDirection {
-    return when(ch) {
-        '^' -> North
-        '>' -> East
-        'v' -> South
-        '<' -> West
-        else -> throw IllegalArgumentException("Unexpected move symbol '$ch'")
-    }
-}
-
-internal fun parseMoves(input: List<String>): List<CardinalDirection> {
-    return input
-        .dropWhile { it.isNotEmpty() } //warehouse layout
-        .drop(1) //blank line
-        .flatMap { line -> line.map { parseMove(it) } }
 }
 
 internal data class Warehouse(val robotLocation: Point, val boxLocations: Set<Point>, val wallLocations: Set<Point>) {
@@ -242,6 +225,23 @@ internal data class Warehouse2(val robotLocation: Point, val boxLeftSideLocation
 
 internal fun Point.score() = (100 * y) + x
 
+internal fun parseMoves(input: List<String>): List<CardinalDirection> {
+    return input
+        .dropWhile { it.isNotEmpty() } //warehouse layout
+        .drop(1) //blank line
+        .flatMap { line -> line.map { parseMove(it) } }
+}
+
+internal fun parseMove(ch: Char): CardinalDirection {
+    return when(ch) {
+        '^' -> North
+        '>' -> East
+        'v' -> South
+        '<' -> West
+        else -> throw IllegalArgumentException("Unexpected move symbol '$ch'")
+    }
+}
+
 internal fun List<String>.transformWarehouseLayout() : List<String> {
     return this
         .takeWhile { it.isNotEmpty() }
@@ -258,4 +258,3 @@ internal fun List<String>.transformWarehouseLayout() : List<String> {
                 .joinToString("")
         }
 }
-

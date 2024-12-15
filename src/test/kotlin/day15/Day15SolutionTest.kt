@@ -1376,17 +1376,17 @@ class Day15SolutionTest {
 
     @Test
     fun `part1 should parse the warehouse, apply all the moves and return the total score given the small sample input`() {
-        assert(solution.part1(smallSampleInput) == 2028L)
+        assert(solution.part1(smallSampleInput) == 2028)
     }
 
     @Test
     fun `part1 should parse the warehouse, apply all the moves and return the total score given the large sample input`() {
-        assert(solution.part1(largeSampleInput) == 10092L)
+        assert(solution.part1(largeSampleInput) == 10092)
     }
 
     @Test
     fun `part2 should parse the doubled warehouse, apply all the moves and return the total score given the large sample input`() {
-        assert(solution.part2(largeSampleInput) == 9021L)
+        assert(solution.part2(largeSampleInput) == 9021)
     }
 
     @Test
@@ -1396,4 +1396,3 @@ class Day15SolutionTest {
     }
 
 }
-
