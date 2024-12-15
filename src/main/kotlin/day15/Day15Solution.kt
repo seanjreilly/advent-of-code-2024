@@ -7,6 +7,8 @@ import utils.CardinalDirection.South
 import utils.CardinalDirection.West
 import utils.LongSolution
 import utils.Point
+import kotlin.collections.minus
+import kotlin.collections.plus
 
 fun main() = Day15Solution().run()
 class Day15Solution : LongSolution() {
@@ -88,4 +90,94 @@ internal data class Warehouse(val robotLocation: Point, val boxLocations: Set<Po
     }
 }
 
+internal data class Warehouse2(val robotLocation: Point, val boxLeftSideLocations: Set<Point>, val wallLocations: Set<Point>) {
+    val boxRightSideLocations = boxLeftSideLocations.map { it.copy(it.x + 1) }.toSet()
+
+    fun moveRobot(direction: CardinalDirection) : Warehouse2 {
+        val potentialNewRobotLocation = robotLocation.move(direction)
+        var nextRoundLeftSideLocations = boxLeftSideLocations
+        if (potentialNewRobotLocation in wallLocations) {
+            return this // can't move
+        }
+
+        if (direction == East) {
+                val visitedLeftSides = mutableSetOf<Point>()
+                var location = potentialNewRobotLocation
+                while (location in boxLeftSideLocations) {
+                    visitedLeftSides += location
+                    location = location.copy(x = location.x + 2) //x+1 is a box right side
+                    if (location in wallLocations) {
+                        return this // can't move
+                    }
+                }
+
+                val leftSidesToRemove = visitedLeftSides
+                val leftSidesToAdd = visitedLeftSides.map { it.east() }
+                nextRoundLeftSideLocations = (boxLeftSideLocations - leftSidesToRemove) + leftSidesToAdd
+        }
+
+        if (direction == West) {
+                val visitedRightSides = mutableSetOf<Point>()
+                var location = potentialNewRobotLocation
+                while (location in boxRightSideLocations) {
+                    visitedRightSides += location
+                    location = location.copy(x = location.x - 2) //x-1 a box left side
+                    if (location in wallLocations) {
+                        return this // can't move
+                    }
+                }
+
+                val leftSidesToRemove = visitedRightSides.map { it.copy(x= it.x -1) }
+                val leftSidesToAdd = visitedRightSides.map { it.copy(x= it.x -2) }
+                nextRoundLeftSideLocations = (boxLeftSideLocations - leftSidesToRemove) + leftSidesToAdd
+        }
+
+        return this.copy(
+            robotLocation = potentialNewRobotLocation,
+            boxLeftSideLocations = nextRoundLeftSideLocations
+        )
+    }
+
+    companion object {
+        internal operator fun invoke(input:List<String>) : Warehouse2 {
+            val rawWarehouseLayout = input
+
+            var robotLocation : Point? = null
+            val boxLeftSideLocations = mutableSetOf<Point>()
+            val wallLocations = mutableSetOf<Point>()
+
+            rawWarehouseLayout.forEachIndexed { y, line ->
+                line.forEachIndexed { x, char ->
+                    val point = Point(x, y)
+                    when (char) {
+                        '@' -> robotLocation = point
+                        '[' -> boxLeftSideLocations += point
+                        '#' -> wallLocations += point
+                    }
+                }
+            }
+
+            return Warehouse2(robotLocation!!, boxLeftSideLocations, wallLocations)
+        }
+    }
+}
+
 internal fun Point.score() = (100 * y) + x
+
+internal fun List<String>.transformWarehouseLayout() : List<String> {
+    return this
+        .takeWhile { it.isNotEmpty() }
+        .map { line ->
+            line.map { ch ->
+                when (ch) {
+                    '#' -> "##"
+                    '@' -> "@."
+                    'O' -> "[]"
+                    '.' -> ".."
+                    else -> throw IllegalArgumentException("unexpected character '$ch'")
+                }
+            }
+                .joinToString("")
+        }
+}
+
