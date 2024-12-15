@@ -72,17 +72,6 @@ class Day15SolutionTest {
         ####################
     """.trimIndent().lines()
 
-
-    private val part2Sample = """
-        ##############
-        ##......##..##
-        ##..........##
-        ##....[][]@.##
-        ##....[]....##
-        ##..........##
-        ##############
-    """.trimIndent().lines()
-
     private val solution = Day15Solution()
 
     // region parseMove tests
@@ -926,6 +915,30 @@ class Day15SolutionTest {
             assert(updatedWarehouse == originalWarehouse)
             assert(updatedWarehouse !== originalWarehouse)
         }
+
+        @Test
+        fun `moveRobot should move without moving the box when the robot is moving north into a space beside a box`() {
+            val input = """
+                ##########
+                ##...[].##
+                ##..@...##
+                ##########
+            """.trimIndent().lines()
+
+            val expectedResult = """
+                ##########
+                ##..@[].##
+                ##......##
+                ##########
+            """.trimIndent().lines()
+
+            val originalWarehouse = Warehouse2(input)
+            val expectedWarehouse = Warehouse2(expectedResult)
+
+            val updatedWarehouse = originalWarehouse.moveRobot(North)
+
+            assert(updatedWarehouse == expectedWarehouse)
+        }
         //endregion
 
         //region moving south
@@ -1243,9 +1256,87 @@ class Day15SolutionTest {
             assert(updatedWarehouse !== originalWarehouse)
         }
 
+        @Test
+        fun `moveRobot should move without moving the box when the robot is moving south into a space beside a box`() {
+            val input = """
+                ##########
+                ##..@...##
+                ##...[].##
+                ##########
+            """.trimIndent().lines()
+
+            val expectedResult = """
+                ##########
+                ##......##
+                ##..@[].##
+                ##########
+            """.trimIndent().lines()
+
+            val originalWarehouse = Warehouse2(input)
+            val expectedWarehouse = Warehouse2(expectedResult)
+
+            val updatedWarehouse = originalWarehouse.moveRobot(South)
+
+            assert(updatedWarehouse == expectedWarehouse)
+        }
+
         //endregion
 
         //endregion
+
+        @Test
+        fun `processing all moves should yield the expected warehouse layout given part2 sample input`() {
+            val input = """
+                #######
+                #...#.#
+                #.....#
+                #..OO@#
+                #..O..#
+                #.....#
+                #######
+
+                <vv<<^^<<^^
+            """.trimIndent().lines()
+            val warehouse = Warehouse2(input.transformWarehouseLayout())
+            val moves = parseMoves(input)
+
+            val expectedResultLayout = """
+                ##############
+                ##...[].##..##
+                ##...@.[]...##
+                ##....[]....##
+                ##..........##
+                ##..........##
+                ##############
+            """.trimIndent().lines()
+            val expectedResult = Warehouse2(expectedResultLayout)
+
+            val result = moves.fold(warehouse) { warehouse, direction -> warehouse.moveRobot(direction) }
+            assert(result == expectedResult)
+        }
+
+        @Test
+        fun `processing all moves should yield the expected warehouse layout given the large sample input`() {
+            val expectedFinalWarehouseLayout = """
+                ####################
+                ##[].......[].[][]##
+                ##[]...........[].##
+                ##[]........[][][]##
+                ##[]......[]....[]##
+                ##..##......[]....##
+                ##..[]............##
+                ##..@......[].[][]##
+                ##......[][]..[]..##
+                ####################
+            """.trimIndent().lines()
+            val expectedFinalWarehouse = Warehouse2(expectedFinalWarehouseLayout)
+            val originalWarehouse = Warehouse2(transformedLargeWarehouseLayout)
+            val moves = parseMoves(largeSampleInput)
+
+            val finalWarehouse = moves.fold(originalWarehouse) { warehouse, direction -> warehouse.moveRobot(direction) }
+
+            assert(finalWarehouse == expectedFinalWarehouse)
+        }
     }
 
     @Nested
