@@ -775,13 +775,159 @@ class Day15SolutionTest {
             assert(updatedWarehouse == expectedWarehouse)
         }
 
-        //single box + wall
-        //column of boxes + wall
-        //one box pushing three boxes
-        //one box pushing three boxes + wall
-        //one box pushing seven boxes
-        //one box pushing seven boxes + wall
+        @Test
+        fun `moveRobot should move the robot and three boxes if the robot is moving north into the left bottom of a triangle of boxes with empty spaces beyond them`() {
+            val input = """
+                ##########
+                ##......##
+                ##.[][].##
+                ##..[]..##
+                ##..@...##
+                ##########
+            """.trimIndent().lines()
 
+            val expectedResult = """
+                ##########
+                ##.[][].##
+                ##..[]..##
+                ##..@...##
+                ##......##
+                ##########
+            """.trimIndent().lines()
+
+            val originalWarehouse = Warehouse2(input)
+            val expectedWarehouse = Warehouse2(expectedResult)
+
+            val updatedWarehouse = originalWarehouse.moveRobot(North)
+
+            assert(updatedWarehouse == expectedWarehouse)
+        }
+
+        @Test
+        fun `moveRobot should move the robot and three boxes if the robot is moving north into the right bottom of a triangle of boxes with empty spaces beyond them`() {
+            val input = """
+                ##########
+                ##......##
+                ##.[][].##
+                ##..[]..##
+                ##...@..##
+                ##########
+            """.trimIndent().lines()
+
+            val expectedResult = """
+                ##########
+                ##.[][].##
+                ##..[]..##
+                ##...@..##
+                ##......##
+                ##########
+            """.trimIndent().lines()
+
+            val originalWarehouse = Warehouse2(input)
+            val expectedWarehouse = Warehouse2(expectedResult)
+
+            val updatedWarehouse = originalWarehouse.moveRobot(North)
+
+            assert(updatedWarehouse == expectedWarehouse)
+        }
+
+        @Test
+        fun `moveRobot should move the robot and multiple boxes if the robot is moving north into the left bottom of a triangle of boxes with empty spaces beyond them`() {
+            val input = """
+                ##########
+                ##......##
+                ##..[][]##
+                ##...[].##
+                ##..[]..##
+                ##..@...##
+                ##########
+            """.trimIndent().lines()
+
+            val expectedResult = """
+                ##########
+                ##..[][]##
+                ##...[].##
+                ##..[]..##
+                ##..@...##
+                ##......##
+                ##########
+            """.trimIndent().lines()
+
+            val originalWarehouse = Warehouse2(input)
+            val expectedWarehouse = Warehouse2(expectedResult)
+
+            val updatedWarehouse = originalWarehouse.moveRobot(North)
+
+            assert(updatedWarehouse == expectedWarehouse)
+        }
+
+        @Test
+        fun `moveRobot should move the robot and seven boxes if the robot is moving north into a big triangle of boxes with empty spaces beyond them`() {
+            val input = """
+                ##########
+                ##......##
+                ##[][][]##
+                ##.[][].##
+                ##..[]..##
+                ##..@...##
+                ##########
+            """.trimIndent().lines()
+
+            val expectedResult = """
+                ##########
+                ##[][][]##
+                ##.[][].##
+                ##..[]..##
+                ##..@...##
+                ##......##
+                ##########
+            """.trimIndent().lines()
+
+            val originalWarehouse = Warehouse2(input)
+            val expectedWarehouse = Warehouse2(expectedResult)
+
+            val updatedWarehouse = originalWarehouse.moveRobot(North)
+
+            assert(updatedWarehouse == expectedWarehouse)
+        }
+
+        @Test
+        fun `moveRobot should not move anything when the robot is moving north into a bunch of boxes with a wall to the north`() {
+            val input = """
+                ##########
+                ##....#.##
+                ##[][][]##
+                ##.[][].##
+                ##..[]..##
+                ##..@...##
+                ##########
+            """.trimIndent().lines()
+
+            val originalWarehouse = Warehouse2(input)
+            val updatedWarehouse = Warehouse2(input).moveRobot(North)
+
+            assert(updatedWarehouse == originalWarehouse)
+            assert(updatedWarehouse !== originalWarehouse)
+        }
+
+        @Test
+        fun `moveRobot should not move anything when the robot is moving north into a weird bunch of boxes with a wall`() {
+            val input = """
+                ##########
+                ##......##
+                ##[][][]##
+                ##.[]#..##
+                ##..[]..##
+                ##..@...##
+                ##########
+            """.trimIndent().lines()
+
+            val originalWarehouse = Warehouse2(input)
+            val updatedWarehouse = Warehouse2(input).moveRobot(North)
+
+            assert(updatedWarehouse == originalWarehouse)
+            assert(updatedWarehouse !== originalWarehouse)
+        }
 
         //endregion
     }

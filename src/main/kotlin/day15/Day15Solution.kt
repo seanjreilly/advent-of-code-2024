@@ -133,28 +133,45 @@ internal data class Warehouse2(val robotLocation: Point, val boxLeftSideLocation
         }
 
         if (direction == North) {
-            val visitedLeftSides = mutableSetOf<Point>()
             var location = potentialNewRobotLocation
-            if (location in boxRightSideLocations) {
-                location = location.west()
-            }
-            while (location in boxLeftSideLocations) {
-                visitedLeftSides += location
-                location = location.north() //x+1 is a box right side
-                if (location in wallLocations) {
-                    return this // can't move
-                }
+            val visitedPoints = mutableSetOf(location)
+            visitedPoints += if (location in boxRightSideLocations) { location.west() } else { location.east() }
+
+            var generation:Set<Point> = visitedPoints
+            while (generation.isNotEmpty()) {
+                visitedPoints += generation
+                generation = generation
+                    .mapNotNull { findNeighbours(it, North) }
+                    .flatMap { pair -> pair.toList() }
+                    .toSet()
             }
 
-            val leftSidesToRemove = visitedLeftSides
-            val leftSidesToAdd = visitedLeftSides.map { it.north() }
+            val leftSidesToRemove = visitedPoints.filter { it in boxLeftSideLocations }
+            val leftSidesToAdd = leftSidesToRemove.map { it.north() }
+            val rightSidesToAdd = visitedPoints.filter { it in boxRightSideLocations }.map { it.north()  }
+            val newPoints = leftSidesToAdd + rightSidesToAdd
+            if (newPoints.any { it in wallLocations }) {
+                return this // can't move
+            }
+
             nextRoundLeftSideLocations = (boxLeftSideLocations - leftSidesToRemove) + leftSidesToAdd
         }
+
+
 
         return this.copy(
             robotLocation = potentialNewRobotLocation,
             boxLeftSideLocations = nextRoundLeftSideLocations
         )
+    }
+
+    private fun findNeighbours(point: Point, direction: CardinalDirection) : Pair<Point, Point>? {
+        val neighbour = point.move(direction)
+        return when (neighbour) {
+            in boxLeftSideLocations -> neighbour to neighbour.east()
+            in boxRightSideLocations -> neighbour to neighbour.west()
+            else -> null
+        }
     }
 
     companion object {
