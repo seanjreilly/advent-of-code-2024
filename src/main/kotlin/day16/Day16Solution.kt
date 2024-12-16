@@ -1,22 +1,18 @@
 package day16
 
-import utils.Bounds
+import utils.*
 import utils.CardinalDirection.East
-import utils.LongSolution
-import utils.Point
-import utils.PointAndDirection
-import utils.TurnDirection.*
-import utils.DijkstrasAlgorithm
 import utils.DijkstrasAlgorithm.Result
-import utils.get
+import utils.TurnDirection.Left
+import utils.TurnDirection.Right
 
 fun main() = Day16Solution().run()
-class Day16Solution : LongSolution() {
-    override fun part1(input: List<String>) = parseMaze(input).findLowestCostToEnd().toLong()
-    override fun part2(input: List<String>) = parseMaze(input).countPointsOnLowestCostToEnd().toLong()
+class Day16Solution : IntSolution() {
+    override fun part1(input: List<String>) = parseMaze(input).findLowestCostToEnd()
+    override fun part2(input: List<String>) = parseMaze(input).countPointsOnLowestCostToEnd()
 }
 
-internal data class Maze(val start: PointAndDirection, val end: Point, val walls: Set<Point>, val bounds: Bounds) {
+internal data class Maze(val start: PointAndDirection, val end: Point, val walls: Set<Point>) {
     fun findLowestCostToEnd(): Int {
         return findBestPathsToEnd().costs
             .filter { it.key.point == end }
@@ -35,7 +31,6 @@ internal data class Maze(val start: PointAndDirection, val end: Point, val walls
             .minBy { it.key }
             .value
             .toSet()
-
 
         var generation = lowestCostEndings
         while (generation.isNotEmpty()) {
@@ -56,9 +51,9 @@ internal data class Maze(val start: PointAndDirection, val end: Point, val walls
                 current.copy(direction = current.direction.turn(Right)) to 1000,
             )
 
-            val forward = current.point.move(current.direction)
-            if (forward in bounds && forward !in walls) {
-                result += ((forward facing current.direction) to 1)
+            val forward = current.move()
+            if (forward.point !in walls) { //no need for a bounds check, there are walls all around
+                result += (forward to 1)
             }
 
             return result
@@ -83,5 +78,5 @@ internal fun parseMaze(input: List<String>): Maze {
         }
     }
 
-    return Maze(start!!, end!!, walls, bounds)
+    return Maze(start!!, end!!, walls)
 }
