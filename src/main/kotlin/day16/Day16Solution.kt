@@ -6,7 +6,8 @@ import utils.LongSolution
 import utils.Point
 import utils.PointAndDirection
 import utils.TurnDirection.*
-import utils.dijkstrasWithPreviousNodes
+import utils.DijkstrasAlgorithm
+import utils.DijkstrasAlgorithm.Result
 import utils.get
 
 fun main() = Day16Solution().run()
@@ -17,7 +18,7 @@ class Day16Solution : LongSolution() {
 
 internal data class Maze(val start: PointAndDirection, val end: Point, val walls: Set<Point>, val bounds: Bounds) {
     fun findLowestCostToEnd(): Int {
-        return findBestPathsToEnd().first
+        return findBestPathsToEnd().costs
             .filter { it.key.point == end }
             .values
             .min()
@@ -48,7 +49,7 @@ internal data class Maze(val start: PointAndDirection, val end: Point, val walls
         return pointsOnPath.size
     }
 
-    internal fun findBestPathsToEnd(): Pair<Map<PointAndDirection, Int>, Map<PointAndDirection, Set<PointAndDirection>>> {
+    internal fun findBestPathsToEnd(): Result<PointAndDirection> {
         fun findNeighbours(current: PointAndDirection): Collection<Pair<PointAndDirection, Int>> {
             val result = mutableListOf(
                 current.copy(direction = current.direction.turn(Left)) to 1000,
@@ -63,7 +64,8 @@ internal data class Maze(val start: PointAndDirection, val end: Point, val walls
             return result
         }
 
-        return dijkstrasWithPreviousNodes(start, neighboursMapping = { findNeighbours(it) })
+        val dijkstras = DijkstrasAlgorithm<PointAndDirection> { findNeighbours(it) }
+        return dijkstras.search(start)
     }
 }
 
