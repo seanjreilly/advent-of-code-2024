@@ -17,7 +17,13 @@ class Day16Solution : LongSolution() {
 
 internal data class Maze(val start: PointAndDirection, val end: Point, val walls: Set<Point>, val bounds: Bounds) {
     fun findLowestCostToEnd(): Int {
+        return findBestPathsToEnd()
+            .filter { entry -> entry.key.point == end }
+            .values
+            .min()
+    }
 
+    internal fun findBestPathsToEnd(): Map<PointAndDirection, Int> {
         fun findNeighbours(current: PointAndDirection): Collection<Pair<PointAndDirection, Int>> {
             val result = mutableListOf(
                 current.copy(direction = current.direction.turn(Left)) to 1000,
@@ -32,10 +38,8 @@ internal data class Maze(val start: PointAndDirection, val end: Point, val walls
             return result
         }
 
-        return dijkstras(start, neighboursMapping = { findNeighbours(it) })
-            .filter { entry -> entry.key.point == end }
-            .values
-            .min()
+        val bestPaths = dijkstras(start, neighboursMapping = { findNeighbours(it) })
+        return bestPaths
     }
 }
 
