@@ -116,7 +116,9 @@ enum class Direction(internal val moveOperation: (Point) -> Point) {
     }
 }
 
-data class PointAndDirection(val point: Point, val direction: CardinalDirection)
+data class PointAndDirection(val point: Point, val direction: CardinalDirection) {
+    fun move() : PointAndDirection = this.copy(point = this.point.move(direction))
+}
 
 data class Bounds(val validXCoordinates: IntRange, val validYCoordinates: IntRange) : Iterable<Point> {
 
