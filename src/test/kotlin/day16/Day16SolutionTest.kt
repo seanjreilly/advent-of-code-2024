@@ -89,8 +89,34 @@ class Day16SolutionTest {
     }
 
     @Test
+    fun `countPointsOnLowestCostToEnd should count the number of tiles on the lowest cost route from start to end`() {
+        val maze: Maze = parseMaze(sampleInput)
+        val expectedNumberOfPoints = 45
+
+        val numberOfPoints: Int = maze.countPointsOnLowestCostToEnd()
+
+        assert(numberOfPoints == expectedNumberOfPoints)
+    }
+
+    @Test
+    fun `countPointsOnLowestCostToEnd should count the number of tiles on the lowest cost route from start to end given the second example`() {
+        val maze: Maze = parseMaze(secondSampleInput)
+        val expectedNumberOfPoints = 64
+
+        val numberOfPoints: Int = maze.countPointsOnLowestCostToEnd()
+
+        assert(numberOfPoints == expectedNumberOfPoints)
+    }
+
+    @Test
     fun `part1 should return the minimum cost through the maze`() {
         assert(solution.part1(sampleInput) == 7036L)
+    }
+
+    @Test
+    fun `part2 should count the number of nodes on the best path(s) through the maze`() {
+        assert(solution.part2(sampleInput) == 45L)
+        assert(solution.part2(secondSampleInput) == 64L)
     }
 }
 

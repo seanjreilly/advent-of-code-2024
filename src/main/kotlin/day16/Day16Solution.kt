@@ -6,24 +6,49 @@ import utils.LongSolution
 import utils.Point
 import utils.PointAndDirection
 import utils.TurnDirection.*
-import utils.dijkstras
+import utils.dijkstrasWithPreviousNodes
 import utils.get
 
 fun main() = Day16Solution().run()
 class Day16Solution : LongSolution() {
     override fun part1(input: List<String>) = parseMaze(input).findLowestCostToEnd().toLong()
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>) = parseMaze(input).countPointsOnLowestCostToEnd().toLong()
 }
 
 internal data class Maze(val start: PointAndDirection, val end: Point, val walls: Set<Point>, val bounds: Bounds) {
     fun findLowestCostToEnd(): Int {
-        return findBestPathsToEnd()
-            .filter { entry -> entry.key.point == end }
+        return findBestPathsToEnd().first
+            .filter { it.key.point == end }
             .values
             .min()
     }
 
-    internal fun findBestPathsToEnd(): Map<PointAndDirection, Int> {
+    fun countPointsOnLowestCostToEnd(): Int {
+        val (costs, previousNodes) = findBestPathsToEnd()
+        val pointsOnPath = mutableSetOf<Point>()
+
+        //you can enter the final point from multiple directions and one might cost more
+        val lowestCostEndings = costs.entries
+            .filter { it.key.point == end }
+            .groupBy({ entry -> entry.value }, {entry -> entry.key})
+            .minBy { it.key }
+            .value
+            .toSet()
+
+
+        var generation = lowestCostEndings
+        while (generation.isNotEmpty()) {
+            pointsOnPath += generation.map { it.point }
+            generation = generation
+                .mapNotNull { previousNodes[it] }
+                .flatMap { it }
+                .toSet()
+        }
+
+        return pointsOnPath.size
+    }
+
+    internal fun findBestPathsToEnd(): Pair<Map<PointAndDirection, Int>, Map<PointAndDirection, Set<PointAndDirection>>> {
         fun findNeighbours(current: PointAndDirection): Collection<Pair<PointAndDirection, Int>> {
             val result = mutableListOf(
                 current.copy(direction = current.direction.turn(Left)) to 1000,
@@ -38,8 +63,7 @@ internal data class Maze(val start: PointAndDirection, val end: Point, val walls
             return result
         }
 
-        val bestPaths = dijkstras(start, neighboursMapping = { findNeighbours(it) })
-        return bestPaths
+        return dijkstrasWithPreviousNodes(start, neighboursMapping = { findNeighbours(it) })
     }
 }
 
