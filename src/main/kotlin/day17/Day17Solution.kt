@@ -12,7 +12,29 @@ class Day17Solution : StringSolution() {
         return program.outputs.joinToString(",")
     }
 
-    override fun part2(input: List<String>) = ""
+    override fun part2(input: List<String>): String {
+        val originalProgram = Program(input)
+        fun recursiveSearch(previousRegisterAValue: Long, existingMatchingTerms: Int): Set<Long> {
+            if (existingMatchingTerms == originalProgram.instructions.size) {
+                return setOf(previousRegisterAValue)
+            }
+
+            val newBaseValue = previousRegisterAValue.shl(3)
+            return (0L..7L)
+                .map { newBaseValue + it }
+                .map { potentialNewRegisterAValue ->
+                    val program = originalProgram.copy(registerA = potentialNewRegisterAValue)
+                    program.execute()
+                    potentialNewRegisterAValue to program.outputs
+                }
+                .filter { (_, outputs) -> outputs.isTailOf(originalProgram.instructions) }
+                .map { it.first }
+                .mapNotNull() { lng -> recursiveSearch(lng, existingMatchingTerms + 1).minOrNull() }
+                .toSet()
+        }
+
+        return recursiveSearch(0L, 0).first().toString()
+    }
 }
 
 internal data class Program(var registerA: Long, var registerB: Long, var registerC: Long, val instructions: List<Int>) {
@@ -127,4 +149,12 @@ internal object Cdv : Instruction(ComboOperand) {
         val operandValue = operand.getValue(operandID, program)
         program.registerC = program.registerA shr operandValue.toInt()
     }
+}
+
+internal fun <T> List<T>.isTailOf(other: List<T>): Boolean {
+    val sizeDifference = other.size - size
+    if (sizeDifference < 0) {
+        return false
+    }
+    return other.drop(sizeDifference) == this
 }

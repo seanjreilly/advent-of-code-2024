@@ -316,4 +316,32 @@ class Day17SolutionTest {
         val expectedResult = "4,6,3,5,6,3,5,2,1,0"
         assert(solution.part1(sampleInput) == expectedResult)
     }
+
+    @Test
+    fun `List dot isTailOf should return true when this list matches the final terms of the other list`() {
+        assert(emptyList<Int>().isTailOf(listOf(1)))
+        assert(listOf(2).isTailOf(listOf(1, 2)))
+        assert(listOf(1, 2).isTailOf(listOf(1, 2)))
+        assert(listOf(3).isTailOf(listOf(1, 2, 3)))
+        assert(listOf(2, 3).isTailOf(listOf(1, 2, 3)))
+        assert(listOf(1, 2, 3).isTailOf(listOf(1, 2, 3)))
+        assert(listOf(4).isTailOf(listOf(1, 2, 3, 4)))
+        assert(listOf(3, 4).isTailOf(listOf(1, 2, 3, 4)))
+        assert(listOf(2, 3, 4).isTailOf(listOf(1, 2, 3, 4)))
+        assert(listOf(1, 2, 3, 4).isTailOf(listOf(1, 2, 3, 4)))
+        assert(listOf('c').isTailOf(listOf('a', 'b', 'c')))
+    }
+
+    @Test
+    fun `List dot isTailOf should return false when this list is longer than the other list`() {
+        assert(!listOf(1).isTailOf(emptyList()))
+    }
+    
+    @Test
+    fun `List dot isTailOf should return false when this list doesn't match the final terms of the other list`() {
+        assert(!listOf(1).isTailOf(listOf(1, 2)))
+        assert(!listOf(1,4,3).isTailOf(listOf(1, 2, 3)))
+    }
 }
+
+
