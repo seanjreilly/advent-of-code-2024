@@ -14,9 +14,9 @@ class Day17Solution : StringSolution() {
 
     override fun part2(input: List<String>): String {
         val originalProgram = Program(input)
-        fun recursiveSearch(previousRegisterAValue: Long, existingMatchingTerms: Int): Set<Long> {
+        fun recursiveSearch(previousRegisterAValue: Long, existingMatchingTerms: Int): Long? {
             if (existingMatchingTerms == originalProgram.instructions.size) {
-                return setOf(previousRegisterAValue)
+                return previousRegisterAValue
             }
 
             val newBaseValue = previousRegisterAValue.shl(3)
@@ -29,11 +29,10 @@ class Day17Solution : StringSolution() {
                 }
                 .filter { (_, outputs) -> outputs.isTailOf(originalProgram.instructions) }
                 .map { it.first }
-                .mapNotNull() { lng -> recursiveSearch(lng, existingMatchingTerms + 1).minOrNull() }
-                .toSet()
+                .firstNotNullOfOrNull { lng -> recursiveSearch(lng, existingMatchingTerms + 1) }
         }
 
-        return recursiveSearch(0L, 0).first().toString()
+        return recursiveSearch(0L, 0).toString()
     }
 }
 
