@@ -51,3 +51,4 @@ abstract class BaseSolution<T> {
 
 abstract class IntSolution : BaseSolution<Int>()
 abstract class LongSolution : BaseSolution<Long>()
+abstract class StringSolution: BaseSolution<String>()
