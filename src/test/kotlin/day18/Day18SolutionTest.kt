@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test
 import utils.Bounds
 import utils.Point
 
+private val TEST_BOUNDS = Bounds(0..6, 0..6)
+private const val TEST_PART1_FALLEN_BYTES = 12
+
 class Day18SolutionTest {
     private val sampleInput = """
         5,4
@@ -32,9 +35,6 @@ class Day18SolutionTest {
         1,6
         2,0
     """.trimIndent().lines()
-
-    private val TEST_BOUNDS = Bounds(0..6, 0..6)
-    private val TEST_PART1_FALLEN_BYTES = 12
 
     private val solution = Day18Solution(TEST_BOUNDS, TEST_PART1_FALLEN_BYTES)
 
