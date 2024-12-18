@@ -2,34 +2,68 @@ package day18
 
 import utils.Bounds
 import utils.DijkstrasAlgorithm
-import utils.LongSolution
 import utils.Point
+import utils.StringSolution
 
 internal val PROD_BOUNDS = Bounds(0 ..70, 0..70)
 internal const val PROD_PART1_FALLEN_BLOCKS = 1024
 
 fun main() = Day18Solution(PROD_BOUNDS, PROD_PART1_FALLEN_BLOCKS).run()
-class Day18Solution(val bounds: Bounds, val part1FallenBlocks: Int) : LongSolution() {
-    override fun part1(input: List<String>): Long {
-        return findShortestPathToExit(bounds, parseFallingBytes(input), part1FallenBlocks).toLong()
+class Day18Solution(val bounds: Bounds, val part1FallenBlocks: Int) : StringSolution() {
+    override fun part1(input: List<String>): String {
+        return findShortestPathToExit(bounds, parseFallingBytes(input), part1FallenBlocks).toString()
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>) : String {
+        val blockingPoint = findFirstFallingByteThatBlocksPath(bounds, parseFallingBytes(input))
+        return "${blockingPoint.x},${blockingPoint.y}"
+    }
+}
+
+internal fun findFirstFallingByteThatBlocksPath(bounds: Bounds, fallingBytes: List<Point>): Point {
+//    var range = fallingBytes.indices
+//    while (range.start != range.endInclusive) {
+//        if (range.isEmpty()) {
+//            throw IllegalStateException("Illegal range ${range}")
+//        }
+//        val midPoint = (range.start + range.endInclusive) / 2
+//        val reachable = isExitReachable(bounds, fallingBytes, midPoint + 1)
+//        range = when(reachable) {
+//            true -> (midPoint + 1)..range.last
+//            false -> range.start until midPoint
+//        }
+//    }
+//    return fallingBytes[range.start]
+
+    val indexOfFirstBlockingPoint = fallingBytes.indices.first { index ->
+        !isExitReachable(bounds, fallingBytes, index + 1)
+    }
+    return fallingBytes[indexOfFirstBlockingPoint]
+}
+
+internal fun isExitReachable(bounds: Bounds, fallingBytes: List<Point>, bytesFallenSoFar: Int): Boolean {
+    return dijkstras(bounds, fallingBytes, bytesFallenSoFar).costs.containsKey(getExitPoint(bounds))
 }
 
 internal fun findShortestPathToExit(bounds: Bounds, fallingBytes: List<Point>, bytesFallenSoFar: Int): Int {
-    val corruptedLocations:Set<Point> = fallingBytes.take(bytesFallenSoFar).toSet()
-    val endPoint = getExitPoint(bounds)
+    return dijkstras(bounds, fallingBytes, bytesFallenSoFar).costs[getExitPoint(bounds)]!!
+}
+
+private fun dijkstras(
+    bounds: Bounds,
+    fallingBytes: List<Point>,
+    bytesFallenSoFar: Int
+): DijkstrasAlgorithm.Result<Point> {
+    val corruptedLocations: Set<Point> = fallingBytes.take(bytesFallenSoFar).toSet()
 
     val dijkstras = DijkstrasAlgorithm<Point> { point ->
         point.getCardinalNeighbours()
-            .filter { it in bounds  }
-            .filter { it !in corruptedLocations  }
+            .filter { it in bounds }
+            .filter { it !in corruptedLocations }
             .map { it to 1 }
     }
 
-    val result = dijkstras.search(Point(0,0))
-    return result.costs[endPoint]!!
+    return dijkstras.search(Point(0, 0))
 }
 
 internal fun parseFallingBytes(input: List<String>): List<Point> {

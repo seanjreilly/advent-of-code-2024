@@ -2,7 +2,6 @@ package day18
 
 import org.junit.jupiter.api.Test
 import utils.Bounds
-import utils.DijkstrasAlgorithm
 import utils.Point
 
 class Day18SolutionTest {
@@ -85,8 +84,46 @@ class Day18SolutionTest {
     }
 
     @Test
-    fun `part1 should return the number of nodes in the shortest path to the exit given the conditions`() {
-        assert(solution.part1(sampleInput) == 22L)
+    fun `isExitReachable should return true if there's a path to the exit given a bounds, list of falling bytes, and how many bytes have fallen`() {
+        val result: Boolean = isExitReachable(TEST_BOUNDS, parseFallingBytes(sampleInput), 12)
+        assert(result)
     }
 
+    @Test
+    fun `isExitReachable should return true given the last falling byte with a safe path to the exit in sample input`() {
+        val result: Boolean = isExitReachable(TEST_BOUNDS, parseFallingBytes(sampleInput), 20)
+        assert(result)
+    }
+
+    @Test
+    fun `isExitReachable should return false once the last path to the exit is blocked`() {
+        val result: Boolean = isExitReachable(TEST_BOUNDS, parseFallingBytes(sampleInput), 21)
+        assert(!result)
+    }
+
+    @Test
+    fun `fallen byte at index 19 in the sample input should be 1,1`() {
+        assert(parseFallingBytes(sampleInput)[19] == Point(1,1))
+    }
+
+    @Test
+    fun `fallen byte at index 20 in the sample input should be 6,1`() {
+        assert(parseFallingBytes(sampleInput)[20] == Point(6,1))
+    }
+
+    @Test
+    fun `findFirstFallingByteThatBlocksPath should find the first point that blocks the last path to the exit`() {
+        val result: Point = findFirstFallingByteThatBlocksPath(TEST_BOUNDS, parseFallingBytes(sampleInput))
+        assert(result == Point(6, 1))
+    }
+
+    @Test
+    fun `part1 should return the number of nodes in the shortest path to the exit given the conditions`() {
+        assert(solution.part1(sampleInput) == "22")
+    }
+
+    @Test
+    fun `part2 should return the point that blocks the last path as a string`() {
+        assert(solution.part2(sampleInput) == "6,1")
+    }
 }
