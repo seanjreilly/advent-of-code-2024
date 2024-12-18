@@ -21,24 +21,19 @@ class Day18Solution(val bounds: Bounds, val part1FallenBlocks: Int) : StringSolu
 }
 
 internal fun findFirstFallingByteThatBlocksPath(bounds: Bounds, fallingBytes: List<Point>): Point {
-//    var range = fallingBytes.indices
-//    while (range.start != range.endInclusive) {
-//        if (range.isEmpty()) {
-//            throw IllegalStateException("Illegal range ${range}")
-//        }
-//        val midPoint = (range.start + range.endInclusive) / 2
-//        val reachable = isExitReachable(bounds, fallingBytes, midPoint + 1)
-//        range = when(reachable) {
-//            true -> (midPoint + 1)..range.last
-//            false -> range.start until midPoint
-//        }
-//    }
-//    return fallingBytes[range.start]
-
-    val indexOfFirstBlockingPoint = fallingBytes.indices.first { index ->
-        !isExitReachable(bounds, fallingBytes, index + 1)
+    var range = fallingBytes.indices
+    while (range.start != range.endInclusive) {
+        if (range.isEmpty()) {
+            throw IllegalStateException("Illegal range ${range}")
+        }
+        val midPoint = (range.start + range.endInclusive) / 2
+        val reachable = isExitReachable(bounds, fallingBytes, midPoint + 1)
+        range = when(reachable) {
+            true -> (midPoint + 1)..range.last
+            false -> range.start .. midPoint
+        }
     }
-    return fallingBytes[indexOfFirstBlockingPoint]
+    return fallingBytes[range.start]
 }
 
 internal fun isExitReachable(bounds: Bounds, fallingBytes: List<Point>, bytesFallenSoFar: Int): Boolean {

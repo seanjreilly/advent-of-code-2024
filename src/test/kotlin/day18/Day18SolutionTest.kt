@@ -118,6 +118,17 @@ class Day18SolutionTest {
     }
 
     @Test
+    fun `findFirstFallingByteThatBlocksPath should find the first point that blocks the last path to the exit for production input`() {
+        val prodFallingBytes = parseFallingBytes(solution.readInput())
+        val result: Point = findFirstFallingByteThatBlocksPath(PROD_BOUNDS, prodFallingBytes)
+        assert(result == Point(64, 54))
+        val byteIndex = prodFallingBytes.indexOf(result)
+
+        assert(isExitReachable(PROD_BOUNDS, prodFallingBytes, byteIndex))
+        assert(!isExitReachable(PROD_BOUNDS, prodFallingBytes, byteIndex + 1))
+    }
+
+    @Test
     fun `part1 should return the number of nodes in the shortest path to the exit given the conditions`() {
         assert(solution.part1(sampleInput) == "22")
     }
