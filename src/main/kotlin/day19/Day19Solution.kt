@@ -12,15 +12,24 @@ class Day19Solution : LongSolution() {
             .toLong()
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>): Long {
+        val towelPatterns = parseTowelPatterns(input)
+        val desiredDesigns = parseDesiredDesigns(input)
+        return desiredDesigns
+            .sumOf { countPossibleTowelCombinations(it, towelPatterns) }
+    }
 }
 
-internal fun parseTowelPatterns(input: List<String>): Set<String> {
-    return input.first().split(", ").toSet()
-}
-
-internal fun parseDesiredDesigns(input: List<String>): List<String> {
-    return input.drop(2)
+internal fun countPossibleTowelCombinations(towelDesign: String, towels: Set<String>): Long {
+    if (towelDesign == "") {
+        return 1L //base case
+    }
+    return towels
+        .filter { towelDesign.startsWith(it) }
+        .map { towelDesign.substring(it.length) }
+        .sumOf { remainingDesign ->
+            countPossibleTowelCombinations(remainingDesign, towels)
+        }
 }
 
 internal fun isDesignPossible(towelDesign: String, towels: Set<String>): Boolean {
@@ -33,4 +42,12 @@ internal fun isDesignPossible(towelDesign: String, towels: Set<String>): Boolean
         .any { remainingDesign ->
             isDesignPossible(remainingDesign, towels)
         }
+}
+
+internal fun parseTowelPatterns(input: List<String>): Set<String> {
+    return input.first().split(", ").toSet()
+}
+
+internal fun parseDesiredDesigns(input: List<String>): List<String> {
+    return input.drop(2)
 }
