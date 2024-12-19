@@ -46,15 +46,8 @@ internal fun isDesignPossible(towelDesign: String, towels: Set<String>): Boolean
     return towels
         .filter { towelDesign.startsWith(it) }
         .map { towelDesign.substring(it.length) }
-        .any { remainingDesign ->
-            isDesignPossible(remainingDesign, towels)
-        }
+        .any { remainingDesign -> isDesignPossible(remainingDesign, towels) }
 }
 
-internal fun parseTowelPatterns(input: List<String>): Set<String> {
-    return input.first().split(", ").toSet()
-}
-
-internal fun parseDesiredDesigns(input: List<String>): List<String> {
-    return input.drop(2)
-}
+internal fun parseTowelPatterns(input: List<String>) = input.first().split(", ").toSet()
+internal fun parseDesiredDesigns(input: List<String>) = input.drop(2)
