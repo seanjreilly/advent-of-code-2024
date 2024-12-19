@@ -13,23 +13,30 @@ class Day19Solution : LongSolution() {
     }
 
     override fun part2(input: List<String>): Long {
-        val towelPatterns = parseTowelPatterns(input)
+        val counter = TowelCombinationCounter(parseTowelPatterns(input))
         val desiredDesigns = parseDesiredDesigns(input)
         return desiredDesigns
-            .sumOf { countPossibleTowelCombinations(it, towelPatterns) }
+            .sumOf { counter.countPossibleTowelCombinations(it) }
     }
 }
 
-internal fun countPossibleTowelCombinations(towelDesign: String, towels: Set<String>): Long {
-    if (towelDesign == "") {
-        return 1L //base case
-    }
-    return towels
-        .filter { towelDesign.startsWith(it) }
-        .map { towelDesign.substring(it.length) }
-        .sumOf { remainingDesign ->
-            countPossibleTowelCombinations(remainingDesign, towels)
+internal class TowelCombinationCounter(val towels: Set<String>) {
+
+    private val substringMap = mutableMapOf<String, Long>("" to 1) //base case
+
+    fun countPossibleTowelCombinations(towelDesign: String): Long {
+        val cachedResult = substringMap[towelDesign]
+        if (cachedResult != null) {
+            return cachedResult
         }
+
+        val result = towels
+            .filter { towelDesign.startsWith(it) }
+            .map { towelDesign.substring(it.length) }
+            .sumOf { remainingDesign -> countPossibleTowelCombinations(remainingDesign) }
+        substringMap.putIfAbsent(towelDesign, result)
+        return result
+    }
 }
 
 internal fun isDesignPossible(towelDesign: String, towels: Set<String>): Boolean {

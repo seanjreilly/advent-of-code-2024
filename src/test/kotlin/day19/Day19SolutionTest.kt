@@ -1,8 +1,10 @@
 package day19
 
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class Day19SolutionTest {
+
     private val sampleInput = """
         r, wr, b, g, bwu, rb, gb, br
 
@@ -73,60 +75,57 @@ class Day19SolutionTest {
 
     }
 
-    @Test
-    fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'brwrr'`() {
-        val towelPatterns = parseTowelPatterns(sampleInput)
-        val combinations: Long = countPossibleTowelCombinations("brwrr", towelPatterns)
-        assert(combinations == 2L)
-    }
+    @Nested
+    inner class TowelCombinationCounterTest {
+        private val counter: TowelCombinationCounter = TowelCombinationCounter(parseTowelPatterns(sampleInput))
 
-    @Test
-    fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'bggr'`() {
-        val towelPatterns = parseTowelPatterns(sampleInput)
-        val combinations: Long = countPossibleTowelCombinations("bggr", towelPatterns)
-        assert(combinations == 1L)
-    }
+        @Test
+        fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'brwrr'`() {
+            val combinations: Long = counter.countPossibleTowelCombinations("brwrr")
+            assert(combinations == 2L)
+        }
 
-    @Test
-    fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'gbbr'`() {
-        val towelPatterns = parseTowelPatterns(sampleInput)
-        val combinations: Long = countPossibleTowelCombinations("gbbr", towelPatterns)
-        assert(combinations == 4L)
-    }
+        @Test
+        fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'bggr'`() {
+            val combinations: Long = counter.countPossibleTowelCombinations("bggr")
+            assert(combinations == 1L)
+        }
 
-    @Test
-    fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'rrbgbr'`() {
-        val towelPatterns = parseTowelPatterns(sampleInput)
-        val combinations: Long = countPossibleTowelCombinations("rrbgbr", towelPatterns)
-        assert(combinations == 6L)
-    }
+        @Test
+        fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'gbbr'`() {
+            val combinations: Long = counter.countPossibleTowelCombinations("gbbr")
+            assert(combinations == 4L)
+        }
 
-    @Test
-    fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'bwurrg'`() {
-        val towelPatterns = parseTowelPatterns(sampleInput)
-        val combinations: Long = countPossibleTowelCombinations("bwurrg", towelPatterns)
-        assert(combinations == 1L)
-    }
+        @Test
+        fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'rrbgbr'`() {
+            val combinations: Long = counter.countPossibleTowelCombinations("rrbgbr")
+            assert(combinations == 6L)
+        }
 
-    @Test
-    fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'brgr'`() {
-        val towelPatterns = parseTowelPatterns(sampleInput)
-        val combinations: Long = countPossibleTowelCombinations("brgr", towelPatterns)
-        assert(combinations == 2L)
-    }
+        @Test
+        fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'bwurrg'`() {
+            val combinations: Long = counter.countPossibleTowelCombinations("bwurrg")
+            assert(combinations == 1L)
+        }
 
-    @Test
-    fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'ubwu'`() {
-        val towelPatterns = parseTowelPatterns(sampleInput)
-        val combinations: Long = countPossibleTowelCombinations("ubwu", towelPatterns)
-        assert(combinations == 0L)
-    }
+        @Test
+        fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'brgr'`() {
+            val combinations: Long = counter.countPossibleTowelCombinations("brgr")
+            assert(combinations == 2L)
+        }
 
-    @Test
-    fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'bbrgwb'`() {
-        val towelPatterns = parseTowelPatterns(sampleInput)
-        val combinations: Long = countPossibleTowelCombinations("bbrgwb", towelPatterns)
-        assert(combinations == 0L)
+        @Test
+        fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'ubwu'`() {
+            val combinations: Long = counter.countPossibleTowelCombinations("ubwu")
+            assert(combinations == 0L)
+        }
+
+        @Test
+        fun `countPossibleTowelCombinations should return the count of possible towel combinations that can make 'bbrgwb'`() {
+            val combinations: Long = counter.countPossibleTowelCombinations("bbrgwb")
+            assert(combinations == 0L)
+        }
     }
 
     @Test
@@ -139,4 +138,3 @@ class Day19SolutionTest {
         assert(solution.part2(sampleInput) == 16L)
     }
 }
-
