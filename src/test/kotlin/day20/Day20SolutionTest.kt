@@ -396,11 +396,11 @@ class Day20SolutionTest {
 
     @Test
     fun `part1 should count the number of cheats that return at least the minimum savings and return the result`() {
-        assert(solution.part1(sampleInput) == 2L)
+        assert(solution.part1(sampleInput) == 2)
     }
     
     @Test
     fun `part2 should count the number of cheats using the part 2 method and return the result`() {
-        assert(solution.part2(sampleInput) == 593L)
+        assert(solution.part2(sampleInput) == 593)
     }
 }

@@ -1,22 +1,17 @@
 package day20
 
-import utils.Bounds
-import utils.DijkstrasAlgorithm
-import utils.LongSolution
-import utils.Point
-import utils.get
-import kotlin.collections.map
+import utils.*
 
 const val PART1_MINIMUM_SAVINGS_PROD = 100
 
 fun main() = Day20Solution(PART1_MINIMUM_SAVINGS_PROD).run()
-class Day20Solution(val part1MinimumSavings: Int) : LongSolution() {
-    override fun part1(input: List<String>): Long {
-        return Racetrack(input).countCheats(part1MinimumSavings).toLong()
+class Day20Solution(val part1MinimumSavings: Int) : IntSolution() {
+    override fun part1(input: List<String>): Int {
+        return Racetrack(input).countCheats(part1MinimumSavings)
     }
 
-    override fun part2(input: List<String>): Long {
-        return Racetrack(input).countCheatsPart2(part1MinimumSavings).toLong()
+    override fun part2(input: List<String>): Int {
+        return Racetrack(input).countCheatsPart2(part1MinimumSavings)
     }
 }
 
