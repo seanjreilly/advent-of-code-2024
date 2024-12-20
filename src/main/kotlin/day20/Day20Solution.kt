@@ -14,7 +14,9 @@ class Day20Solution(val part1MinimumSavings: Int) : LongSolution() {
         return Racetrack(input).countCheats(part1MinimumSavings).toLong()
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>): Long {
+        return Racetrack(input).countCheatsPart2(part1MinimumSavings).toLong()
+    }
 }
 
 internal data class Racetrack(val start: Point, val end: Point, val walls: Set<Point>, val bounds: Bounds) {
@@ -42,6 +44,26 @@ internal data class Racetrack(val start: Point, val end: Point, val walls: Set<P
             .map { it to it.pointsWithManhattanDistance(2).toSet().intersect(pointsInNonCheatingPath) }
             .flatMap { (exit, pointsOnOriginalPath) -> pointsOnOriginalPath.map { exit to it } }
             .filter{ (cheatExit, _) -> costs.containsKey(cheatExit) } //exit point must reach the end of the race
+            .filter { (cheatExit, cheatStart) ->
+                val cheatCost = cheatExit.manhattanDistance(cheatStart)
+                val costWithoutCheating = costs[cheatStart]!!
+                val costWithCheating = costs[cheatExit]!! + cheatCost //we don't teleport to the cheat exit
+                costWithoutCheating - costWithCheating >= minimumSavings
+            }
+        return potentialCheats.count()
+    }
+
+    fun countCheatsPart2(minimumSavings: Int): Int {
+        val pointsInNonCheatingPath = fastestPathWithoutCheating().toSet() - end
+        val costs = dijkstraSearchResult.costs
+        // don't need to worry about bogus cheat paths that don't cross a wall
+        // these don't save any time and are automatically eliminated
+        val potentialCheats = bounds
+            .filter { it !in walls } //exit point must not be in a wall
+            .filter { costs.containsKey(it) } //exit point must reach the end of the race
+            .asSequence()
+            .flatMap { exitPoint -> pointsInNonCheatingPath.map { exitPoint to it } }
+            .filter { (exitPoint, startPoint) -> exitPoint.manhattanDistance(startPoint) <= 20 }
             .filter { (cheatExit, cheatStart) ->
                 val cheatCost = cheatExit.manhattanDistance(cheatStart)
                 val costWithoutCheating = costs[cheatStart]!!

@@ -94,6 +94,8 @@ class Day20SolutionTest {
             }
         }
 
+        //region countCheats (part 1) tests
+
         @Test
         fun `countCheats should find 44 potential cheats given a minimum savings 1 picosecond`() {
             val minimumSavings = 1
@@ -233,10 +235,172 @@ class Day20SolutionTest {
 
             assert(cheatsFound == 0)
         }
+
+        //endregion
+
+        //region countCheats (part2) tests
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 50 picoseconds`() {
+            val minimumSavings = 50
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            val expectedCheats = 32 + 31 + 29 + 39 + 25 + 23 + 20 + 19 + 12 + 14 + 12 + 22 + 4 + 3
+            assert(cheatsFound == expectedCheats)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 52 picoseconds`() {
+            val minimumSavings = 52
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 31 + 29 + 39 + 25 +23 + 20 + 19 + 12 + 14 + 12 + 22 + 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 54 picoseconds`() {
+            val minimumSavings = 54
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 29 + 39 + 25 +23 + 20 + 19 + 12 + 14 + 12 + 22 + 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 56 picoseconds`() {
+            val minimumSavings = 56
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 39 + 25 +23 + 20 + 19 + 12 + 14 + 12 + 22 + 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 58 picoseconds`() {
+            val minimumSavings = 58
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 25 +23 + 20 + 19 + 12 + 14 + 12 + 22 + 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 60 picoseconds`() {
+            val minimumSavings = 60
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 23 + 20 + 19 + 12 + 14 + 12 + 22 + 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 62 picoseconds`() {
+            val minimumSavings = 62
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 20 + 19 + 12 + 14 + 12 + 22 + 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 64 picoseconds`() {
+            val minimumSavings = 64
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 19 + 12 + 14 + 12 + 22 + 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 66 picoseconds`() {
+            val minimumSavings = 66
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 12 + 14 + 12 + 22 + 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 68 picoseconds`() {
+            val minimumSavings = 68
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 14 + 12 + 22 + 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 70 picoseconds`() {
+            val minimumSavings = 70
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 12 + 22 + 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 72 picoseconds`() {
+            val minimumSavings = 72
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 22 + 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 74 picoseconds`() {
+            val minimumSavings = 74
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 4 + 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find the correct number of potential cheats given a minimum savings of 76 picoseconds`() {
+            val minimumSavings = 76
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 3)
+        }
+
+        @Test
+        fun `countCheatsPart2 should find no potential cheats given a minimum savings of 77 picoseconds`() {
+            val minimumSavings = 77
+            val racetrack = Racetrack(sampleInput)
+
+            val cheatsFound: Int = racetrack.countCheatsPart2(minimumSavings)
+
+            assert(cheatsFound == 0)
+        }
+
+        //endregion
     }
 
     @Test
     fun `part1 should count the number of cheats that return at least the minimum savings and return the result`() {
         assert(solution.part1(sampleInput) == 2L)
+    }
+    
+    @Test
+    fun `part2 should count the number of cheats using the part 2 method and return the result`() {
+        assert(solution.part2(sampleInput) == 593L)
     }
 }
