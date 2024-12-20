@@ -50,22 +50,24 @@ internal data class Racetrack(val start: Point, val end: Point, val walls: Set<P
     }
 
     fun countCheatsPart2(minimumSavings: Int): Int {
-        val pointsInNonCheatingPath = fastestPathWithoutCheating().toSet() - end
+        val pointsInNonCheatingPath = fastestPathWithoutCheating().toSet()
         val costs = dijkstraSearchResult.costs
-        // don't need to worry about bogus cheat paths that don't cross a wall
-        // these don't save any time and are automatically eliminated
-        return bounds
-            .filter { costs.containsKey(it) } //exit point must reach the end of the race
+
+        return (pointsInNonCheatingPath)
             .parallelStream()
-            .flatMap { exitPoint -> pointsInNonCheatingPath.map { exitPoint to it }.parallelStream() }
-            .filter { (exitPoint, startPoint) -> exitPoint.manhattanDistance(startPoint) <= 20 }
-            .filter { (cheatExit, cheatStart) ->
-                val cheatCost = cheatExit.manhattanDistance(cheatStart)
+            .flatMap { startPoint ->
+                pointsInNonCheatingPath
+                    .parallelStream()
+                    .filter { startPoint.manhattanDistance(it) <= 20 }
+                    .map { startPoint to it }
+            }.filter { (cheatStart, cheatExit) ->
+                val cheatCost = cheatStart.manhattanDistance(cheatExit)
                 val costWithoutCheating = costs[cheatStart]!!
                 val costWithCheating = costs[cheatExit]!! + cheatCost //we don't teleport to the cheat exit
                 costWithoutCheating - costWithCheating >= minimumSavings
             }
-            .count().toInt()
+            .count()
+            .toInt()
     }
 
     private fun runDijkstrasSearch(): DijkstrasAlgorithm.Result<Point> {
