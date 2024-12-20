@@ -9,12 +9,15 @@ abstract class BaseSolution<T> {
     fun run() {
         print("Advent of Code year ${year}, day ${day}: ")
         val input = readInput()
-        val elapsed = measureTimeMillis {
+        val elapsedPart1 = measureTimeMillis {
             println(part1(input))
+        }
+        val elapsedPart2 = measureTimeMillis {
             println(part2(input))
         }
         println()
-        println("Elapsed time: $elapsed ms.")
+        println("Part 1 Elapsed time: $elapsedPart1 ms.")
+        println("Part 2 Elapsed time: $elapsedPart2 ms.")
     }
 
     private fun getAoCDay() : Int {
