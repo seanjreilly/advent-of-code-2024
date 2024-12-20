@@ -5,6 +5,7 @@ import utils.DijkstrasAlgorithm
 import utils.LongSolution
 import utils.Point
 import utils.get
+import kotlin.collections.map
 
 const val PART1_MINIMUM_SAVINGS_PROD = 100
 
@@ -58,11 +59,10 @@ internal data class Racetrack(val start: Point, val end: Point, val walls: Set<P
         val costs = dijkstraSearchResult.costs
         // don't need to worry about bogus cheat paths that don't cross a wall
         // these don't save any time and are automatically eliminated
-        val potentialCheats = bounds
-            .filter { it !in walls } //exit point must not be in a wall
+        return bounds
             .filter { costs.containsKey(it) } //exit point must reach the end of the race
-            .asSequence()
-            .flatMap { exitPoint -> pointsInNonCheatingPath.map { exitPoint to it } }
+            .parallelStream()
+            .flatMap { exitPoint -> pointsInNonCheatingPath.map { exitPoint to it }.parallelStream() }
             .filter { (exitPoint, startPoint) -> exitPoint.manhattanDistance(startPoint) <= 20 }
             .filter { (cheatExit, cheatStart) ->
                 val cheatCost = cheatExit.manhattanDistance(cheatStart)
@@ -70,7 +70,7 @@ internal data class Racetrack(val start: Point, val end: Point, val walls: Set<P
                 val costWithCheating = costs[cheatExit]!! + cheatCost //we don't teleport to the cheat exit
                 costWithoutCheating - costWithCheating >= minimumSavings
             }
-        return potentialCheats.count()
+            .count().toInt()
     }
 
     private fun runDijkstrasSearch(): DijkstrasAlgorithm.Result<Point> {
