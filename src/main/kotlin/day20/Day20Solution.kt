@@ -33,8 +33,10 @@ internal data class Racetrack(val start: Point, val end: Point, val walls: Set<P
     fun countCheats(minimumSavings: Int): Int {
         val pointsInNonCheatingPath = fastestPathWithoutCheating().toSet() - end
         val costs = dijkstraSearchResult.costs
+
         // don't need to worry about bogus cheat paths that don't cross a wall
         // these don't save any time and are automatically eliminated
+
         val potentialCheats = bounds
             .filter { it !in walls } //exit point must not be in a wall
             .map { it to it.pointsWithManhattanDistance(2).toSet().intersect(pointsInNonCheatingPath) }
