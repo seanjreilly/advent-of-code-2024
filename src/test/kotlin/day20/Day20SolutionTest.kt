@@ -6,7 +6,7 @@ import utils.Bounds
 import utils.Point
 import utils.get
 
-const val PART1_MINIMUM_SAVINGS_TEST = 40
+const val MINIMUM_SAVINGS_TEST = 40
 
 class Day20SolutionTest {
     private val sampleInput = """
@@ -27,7 +27,7 @@ class Day20SolutionTest {
         ###############
     """.trimIndent().lines()
 
-    private val solution = Day20Solution(PART1_MINIMUM_SAVINGS_TEST)
+    private val solution = Day20Solution(MINIMUM_SAVINGS_TEST)
 
     @Test
     fun `count the number of stars in the production input`() {

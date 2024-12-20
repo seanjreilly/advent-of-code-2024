@@ -2,16 +2,16 @@ package day20
 
 import utils.*
 
-const val PART1_MINIMUM_SAVINGS_PROD = 100
+const val MINIMUM_SAVINGS_PROD = 100
 
-fun main() = Day20Solution(PART1_MINIMUM_SAVINGS_PROD).run()
-class Day20Solution(val part1MinimumSavings: Int) : IntSolution() {
+fun main() = Day20Solution(MINIMUM_SAVINGS_PROD).run()
+class Day20Solution(val minimumSavings: Int) : IntSolution() {
     override fun part1(input: List<String>): Int {
-        return Racetrack(input).countCheats(part1MinimumSavings)
+        return Racetrack(input).countCheats(minimumSavings)
     }
 
     override fun part2(input: List<String>): Int {
-        return Racetrack(input).countCheatsPart2(part1MinimumSavings)
+        return Racetrack(input).countCheatsPart2(minimumSavings)
     }
 }
 
