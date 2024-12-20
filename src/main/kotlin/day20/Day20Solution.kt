@@ -43,8 +43,9 @@ internal data class Racetrack(val start: Point, val end: Point, val walls: Set<P
             .flatMap { (exit, pointsOnOriginalPath) -> pointsOnOriginalPath.map { exit to it } }
             .filter{ (cheatExit, _) -> costs.containsKey(cheatExit) } //exit point must reach the end of the race
             .filter { (cheatExit, cheatStart) ->
+                val cheatCost = cheatExit.manhattanDistance(cheatStart)
                 val costWithoutCheating = costs[cheatStart]!!
-                val costWithCheating = costs[cheatExit]!! + 2 //we don't teleport to the cheat exit
+                val costWithCheating = costs[cheatExit]!! + cheatCost //we don't teleport to the cheat exit
                 costWithoutCheating - costWithCheating >= minimumSavings
             }
         return potentialCheats.count()
