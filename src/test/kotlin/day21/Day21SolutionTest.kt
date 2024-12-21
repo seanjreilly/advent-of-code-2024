@@ -2,6 +2,8 @@ package day21
 
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
+import java.lang.NullPointerException
 
 class Day21SolutionTest {
     private val sampleInput = """
@@ -30,10 +32,116 @@ class Day21SolutionTest {
     private val solution = Day21Solution()
 
     @Nested
-    inner class DoorKeyboardTest {
+    inner class DoorKeypadTest {
 
         @Test
-        fun `doorKeyboard should translate 029A into the correct sequence`() {
+        fun `immediateDoorKeypadTransitions should contain the correct values`() {
+            assert(immediateDoorKeypadTransitions.size == 11)
+            assert(immediateDoorKeypadTransitions['A'] == mapOf('0' to '<', '3' to '^'))
+            assert(immediateDoorKeypadTransitions['0'] == mapOf('2' to '^', 'A' to '>'))
+            assert(immediateDoorKeypadTransitions['1'] == mapOf('4' to '^', '2' to '>'))
+            assert(immediateDoorKeypadTransitions['2'] == mapOf('1' to '<', '5' to '^', '3' to '>', '0' to 'v'))
+            assert(immediateDoorKeypadTransitions['3'] == mapOf('2' to '<', '6' to '^', 'A' to 'v'))
+            assert(immediateDoorKeypadTransitions['4'] == mapOf('7' to '^', '5' to '>', '1' to 'v'))
+            assert(immediateDoorKeypadTransitions['5'] == mapOf('4' to '<', '8' to '^', '6' to '>', '2' to 'v'))
+            assert(immediateDoorKeypadTransitions['6'] == mapOf('5' to '<', '9' to '^', '3' to 'v'))
+            assert(immediateDoorKeypadTransitions['7'] == mapOf('8' to '>', '4' to 'v'))
+            assert(immediateDoorKeypadTransitions['8'] == mapOf('7' to '<', '9' to '>', '5' to 'v'))
+            assert(immediateDoorKeypadTransitions['9'] == mapOf('8' to '<', '6' to 'v'))
+        }
+
+        @Test
+        fun `immediateDoorKeypadTransitions should have a reverse mapping for every mapping`() {
+            val opposites = mapOf(
+                '<' to '>',
+                '>' to '<',
+                '^' to 'v',
+                'v' to '^'
+            )
+
+            immediateDoorKeypadTransitions.forEach { first, remainingMap ->
+                remainingMap.forEach { second, value ->
+                    try {
+                        assert(immediateDoorKeypadTransitions[second]!![first]!! == opposites[value])
+                    } catch (e: NullPointerException) {
+                        fail("Could not find reverse mapping from ${second} to ${first} (expected '${opposites[value]}')")
+                    }
+                }
+            }
+        }
+
+        @Test
+        fun `immediateDoorKeypadTransitions should not map any key directly to itself`() {
+            immediateDoorKeypadTransitions.forEach { first, remainingMap ->
+                assert(!remainingMap.containsKey(first))
+            }
+        }
+        
+        @Test
+        fun `generateAllShortestTransitions should map from every key to itself given immediateDoorKeypadTransitions`() {
+            val shortestTransitions: Map<KeyTransition, Set<String>> = generateAllShortestTransitions(immediateDoorKeypadTransitions)
+            "A0123456789".forEach {
+                assert(shortestTransitions[KeyTransition(it, it)] == setOf("A"))
+            }
+        }
+
+        @Test
+        fun `generateAllShortestTransitions should generate basic transitions for neighbours given immediateDoorKeypadTransitions`() {
+            val shortestTransitions: Map<KeyTransition, Set<String>> = generateAllShortestTransitions(immediateDoorKeypadTransitions)
+
+            assert(shortestTransitions[KeyTransition('A', '0')] == setOf("<A"))
+            assert(shortestTransitions[KeyTransition('A', '3')] == setOf("^A"))
+
+            assert(shortestTransitions[KeyTransition('5', '4')] == setOf("<A"))
+            assert(shortestTransitions[KeyTransition('5', '8')] == setOf("^A"))
+            assert(shortestTransitions[KeyTransition('5', '6')] == setOf(">A"))
+            assert(shortestTransitions[KeyTransition('5', '2')] == setOf("vA"))
+        }
+
+        @Test
+        fun `generateAllShortestTransitions should not generate any forbidden transitions given immediateDoorKeypadTransitions`() {
+            val shortestTransitions: Map<KeyTransition, Set<String>> = generateAllShortestTransitions(immediateDoorKeypadTransitions)
+
+            assert(shortestTransitions[KeyTransition('1', '0')]!!.size == 1)
+        }
+
+        @Test
+        fun `generateAllShortestTransitions should generate complete mappings given immediateDoorKeypadTransitions`() {
+            val shortestTransitions: Map<KeyTransition, Set<String>> = generateAllShortestTransitions(immediateDoorKeypadTransitions)
+
+            assert(shortestTransitions.size == 121)
+        }
+
+        @Test
+        fun `generateAllShortestTransitions should generate all of the shortest paths from 0 to 7 given immediateDoorKeypadTransitions`() {
+            val shortestTransitions: Map<KeyTransition, Set<String>> = generateAllShortestTransitions(immediateDoorKeypadTransitions)
+
+            val expectedTransitions = setOf(
+                "^^^<A",
+                "^^<^A",
+                "^<^^A"
+            )
+
+            val transitions = shortestTransitions[KeyTransition('0', '7')]
+            assert(transitions == expectedTransitions)
+        }
+
+        @Test
+        fun `generateAllShortestTransitions should generate all of the shortest paths from 2 to 9 given immediateDoorKeypadTransitions`() {
+            val shortestTransitions: Map<KeyTransition, Set<String>> = generateAllShortestTransitions(immediateDoorKeypadTransitions)
+
+            val expectedTransitions = setOf(
+                "^^>A",
+                "^>^A",
+                ">^^A"
+            )
+
+            val transitions = shortestTransitions[KeyTransition('2', '9')]
+            assert(transitions == expectedTransitions)
+        }
+
+        @Test
+        fun `doorKeyboard should translate 029A into the correct sequences`() {
             val expectedOutput = "<A^A>^^AvvvA"
             val result = doorKeyboard("029A")
             assert(result == expectedOutput)
@@ -44,168 +152,6 @@ class Day21SolutionTest {
             val expectedOutput = "^^^A<AvvvA>A"
             val result = doorKeyboard("980A")
             assert(result == expectedOutput)
-        }
-
-        @Test
-        fun `doorKeyboard should encode all transitions to and from A into the correct sequence`() {
-            assert(doorKeyboard("AA") == "AA")
-            assert(doorKeyboard("0A") == "<A>A")
-            assert(doorKeyboard("1A") == "^<<A>>vA")
-            assert(doorKeyboard("2A") == "^<A>vA")
-            assert(doorKeyboard("3A") == "^AvA")
-            assert(doorKeyboard("4A") == "^^<<A>>vvA")
-            assert(doorKeyboard("5A") == "^^<A>vvA")
-            assert(doorKeyboard("6A") == "^^AvvA")
-            assert(doorKeyboard("7A") == "^^^<<A>>vvvA")
-            assert(doorKeyboard("8A") == "^^^<A>vvvA")
-        }
-
-        @Test
-        fun `doorKeyboard should encode all transitions from 0 into the correct sequence`() {
-            assert(doorKeyboard("00A") == "<AA>A")
-            assert(doorKeyboard("01A") == "<A^<A>>vA")
-            assert(doorKeyboard("02A") == "<A^A>vA")
-            assert(doorKeyboard("03A") == "<A^>AvA")
-            assert(doorKeyboard("04A") == "<A^^<A>>vvA")
-            assert(doorKeyboard("05A") == "<A^^A>vvA")
-            assert(doorKeyboard("06A") == "<A^^>AvvA")
-            assert(doorKeyboard("07A") == "<A^^^<A>>vvvA")
-            assert(doorKeyboard("08A") == "<A^^^A>vvvA")
-            assert(doorKeyboard("09A") == "<A^^^>AvvvA")
-        }
-
-        @Test
-        fun `doorKeyboard should encode all transitions from 1 into the correct sequence`() {
-            assert(doorKeyboard("10A") == "^<<A>vA>A")
-            assert(doorKeyboard("11A") == "^<<AA>>vA")
-            assert(doorKeyboard("12A") == "^<<A>A>vA")
-            assert(doorKeyboard("13A") == "^<<A>>AvA")
-            assert(doorKeyboard("14A") == "^<<A^A>>vvA")
-            assert(doorKeyboard("15A") == "^<<A^>A>vvA")
-            assert(doorKeyboard("16A") == "^<<A^>>AvvA")
-            assert(doorKeyboard("17A") == "^<<A^^A>>vvvA")
-            assert(doorKeyboard("18A") == "^<<A^^>A>vvvA")
-            assert(doorKeyboard("19A") == "^<<A^^>>AvvvA")
-        }
-
-        @Test
-        fun `doorKeyboard should encode all transitions from 2 into the correct sequence`() {
-            assert(doorKeyboard("20A") == "^<AvA>A")
-            assert(doorKeyboard("21A") == "^<A<A>>vA")
-            assert(doorKeyboard("22A") == "^<AA>vA")
-            assert(doorKeyboard("23A") == "^<A>AvA")
-            assert(doorKeyboard("24A") == "^<A^<A>>vvA")
-            assert(doorKeyboard("25A") == "^<A^A>vvA")
-            assert(doorKeyboard("26A") == "^<A^>AvvA")
-            assert(doorKeyboard("27A") == "^<A^^<A>>vvvA")
-            assert(doorKeyboard("28A") == "^<A^^A>vvvA")
-            assert(doorKeyboard("29A") == "^<A>^^AvvvA")
-        }
-
-        @Test
-        fun `doorKeyboard should encode all transitions from 3 into the correct sequence`() {
-            assert(doorKeyboard("30A") == "^Av<A>A")
-            assert(doorKeyboard("31A") == "^A<<A>>vA")
-            assert(doorKeyboard("32A") == "^A<A>vA")
-            assert(doorKeyboard("33A") == "^AAvA")
-            assert(doorKeyboard("34A") == "^A^<<A>>vvA")
-            assert(doorKeyboard("35A") == "^A^<A>vvA")
-            assert(doorKeyboard("36A") == "^A^AvvA")
-            assert(doorKeyboard("37A") == "^A^^<<A>>vvvA")
-            assert(doorKeyboard("38A") == "^A^^<A>vvvA")
-            assert(doorKeyboard("39A") == "^A^^AvvvA")
-        }
-
-        @Test
-        fun `doorKeyboard should encode all transitions from 4 into the correct sequence`() {
-            assert(doorKeyboard("40A") == "^^<<A>vvA>A")
-            assert(doorKeyboard("41A") == "^^<<AvA>>vA")
-            assert(doorKeyboard("42A") == "^^<<A>vA>vA")
-            assert(doorKeyboard("43A") == "^^<<A>>vAvA")
-            assert(doorKeyboard("44A") == "^^<<AA>>vvA")
-            assert(doorKeyboard("45A") == "^^<<A>A>vvA")
-            assert(doorKeyboard("46A") == "^^<<A>>AvvA")
-            assert(doorKeyboard("47A") == "^^<<A^A>>vvvA")
-            assert(doorKeyboard("48A") == "^^<<A^>A>vvvA")
-            assert(doorKeyboard("49A") == "^^<<A^>>AvvvA")
-        }
-
-        @Test
-        fun `doorKeyboard should encode all transitions from 5 into the correct sequence`() {
-            assert(doorKeyboard("50A") == "^^<AvvA>A")
-            assert(doorKeyboard("51A") == "^^<Av<A>>vA")
-            assert(doorKeyboard("52A") == "^^<AvA>vA")
-            assert(doorKeyboard("53A") == "^^<Av>AvA")
-            assert(doorKeyboard("54A") == "^^<A<A>>vvA")
-            assert(doorKeyboard("55A") == "^^<AA>vvA")
-            assert(doorKeyboard("56A") == "^^<A>AvvA")
-            assert(doorKeyboard("57A") == "^^<A^<A>>vvvA")
-            assert(doorKeyboard("58A") == "^^<A^A>vvvA")
-            assert(doorKeyboard("59A") == "^^<A^>AvvvA")
-        }
-
-        @Test
-        fun `doorKeyboard should encode all transitions from 6 into the correct sequence`() {
-            assert(doorKeyboard("60A") == "^^A<vvA>A")
-            assert(doorKeyboard("61A") == "^^A<<vA>>vA")
-            assert(doorKeyboard("62A") == "^^A<vA>vA")
-            assert(doorKeyboard("63A") == "^^AvAvA")
-            assert(doorKeyboard("64A") == "^^A<<A>>vvA")
-            assert(doorKeyboard("65A") == "^^A<A>vvA")
-            assert(doorKeyboard("66A") == "^^AAvvA")
-            assert(doorKeyboard("67A") == "^^A^<<A>>vvvA")
-            assert(doorKeyboard("68A") == "^^A^<A>vvvA")
-            assert(doorKeyboard("69A") == "^^A^AvvvA")
-        }
-
-        @Test
-        fun `doorKeyboard should encode all transitions from 7 into the correct sequence`() {
-            assert(doorKeyboard("70A") == "^^^<<A>vvvA>A")
-            assert(doorKeyboard("71A") == "^^^<<AvvA>>vA")
-            assert(doorKeyboard("72A") == "^^^<<A>vvA>vA")
-            assert(doorKeyboard("73A") == "^^^<<A>>vvAvA")
-            assert(doorKeyboard("74A") == "^^^<<AvA>>vvA")
-            assert(doorKeyboard("75A") == "^^^<<Av>A>vvA")
-            assert(doorKeyboard("76A") == "^^^<<Av>>AvvA")
-            assert(doorKeyboard("77A") == "^^^<<AA>>vvvA")
-            assert(doorKeyboard("78A") == "^^^<<A>A>vvvA")
-            assert(doorKeyboard("79A") == "^^^<<A>>AvvvA")
-        }
-
-        @Test
-        fun `doorKeyboard should encode all transitions from 8 into the correct sequence`() {
-            assert(doorKeyboard("80A") == "^^^<AvvvA>A")
-            assert(doorKeyboard("81A") == "^^^<A<vvA>>vA")
-            assert(doorKeyboard("82A") == "^^^<AvvA>vA")
-            assert(doorKeyboard("83A") == "^^^<A>vvAvA")
-            assert(doorKeyboard("84A") == "^^^<A<vA>>vvA")
-            assert(doorKeyboard("85A") == "^^^<AvA>vvA")
-            assert(doorKeyboard("86A") == "^^^<Av>AvvA")
-            assert(doorKeyboard("87A") == "^^^<A<A>>vvvA")
-            assert(doorKeyboard("88A") == "^^^<AA>vvvA")
-            assert(doorKeyboard("89A") == "^^^<A>AvvvA")
-        }
-
-        @Test
-        fun `doorKeyboard should encode all transitions from 9 into the correct sequence`() {
-            assert(doorKeyboard("90A") == "^^^A<vvvA>A")
-            assert(doorKeyboard("91A") == "^^^A<<vvA>>vA")
-            assert(doorKeyboard("92A") == "^^^A<vvA>vA")
-            assert(doorKeyboard("93A") == "^^^AvvAvA")
-            assert(doorKeyboard("94A") == "^^^A<<vA>>vvA")
-            assert(doorKeyboard("95A") == "^^^A<vA>vvA")
-            assert(doorKeyboard("96A") == "^^^AvAvvA")
-            assert(doorKeyboard("97A") == "^^^A<<A>>vvvA")
-            assert(doorKeyboard("98A") == "^^^A<A>vvvA")
-            assert(doorKeyboard("99A") == "^^^AAvvvA")
-        }
-
-        @Test
-        fun `doorKeyboardTransitions should have complete mappings`() {
-            assert(doorKeyboardTransitions.size == 121)
-            "A0123456789".forEach { char ->
-                assert(doorKeyboardTransitions[KeyTransition(char, char)] == "A")
-            }
         }
 
         @Test
@@ -220,6 +166,82 @@ class Day21SolutionTest {
     @Nested
     inner class RobotKeyboardTest {
         @Test
+        fun `immediateRobotKeypadTransitions should contain the correct values`() {
+            assert(immediateRobotKeypadTransitions.size == 5)
+            assert(immediateRobotKeypadTransitions['A'] == mapOf('^' to '<', '>' to 'v'))
+            assert(immediateRobotKeypadTransitions['^'] == mapOf('A' to '>', 'v' to 'v'))
+            assert(immediateRobotKeypadTransitions['>'] == mapOf('A' to '^', 'v' to '<'))
+            assert(immediateRobotKeypadTransitions['v'] == mapOf('^' to '^', '<' to '<', '>' to '>'))
+            assert(immediateRobotKeypadTransitions['<'] == mapOf('v' to '>'))
+        }
+
+        @Test
+        fun `immediateRobotKeypadTransitions should have a reverse mapping for every mapping`() {
+            val opposites = mapOf(
+                '<' to '>',
+                '>' to '<',
+                '^' to 'v',
+                'v' to '^'
+            )
+
+            immediateRobotKeypadTransitions.forEach { first, remainingMap ->
+                remainingMap.forEach { second, value ->
+                    try {
+                        assert(immediateRobotKeypadTransitions[second]!![first]!! == opposites[value])
+                    } catch (e: NullPointerException) {
+                        fail("Could not find reverse mapping from ${second} to ${first} (expected '${opposites[value]}')")
+                    }
+                }
+            }
+        }
+
+        @Test
+        fun `immediateRobotKeypadTransitions should not map any key directly to itself`() {
+            immediateRobotKeypadTransitions.forEach { first, remainingMap ->
+                assert(!remainingMap.containsKey(first))
+            }
+        }
+
+        @Test
+        fun `generateAllShortestTransitions should generate basic transitions for neighbours given immediateRobotKeypadTransitions`() {
+            val shortestTransitions: Map<KeyTransition, Set<String>> = generateAllShortestTransitions(immediateRobotKeypadTransitions)
+
+            assert(shortestTransitions[KeyTransition('A', '^')] == setOf("<A"))
+            assert(shortestTransitions[KeyTransition('A', '>')] == setOf("vA"))
+
+            assert(shortestTransitions[KeyTransition('v', '^')] == setOf("^A"))
+            assert(shortestTransitions[KeyTransition('v', '<')] == setOf("<A"))
+            assert(shortestTransitions[KeyTransition('v', '>')] == setOf(">A"))
+        }
+
+        @Test
+        fun `generateAllShortestTransitions should not generate any forbidden transitions given immediateRobotKeypadTransitions`() {
+            val shortestTransitions: Map<KeyTransition, Set<String>> = generateAllShortestTransitions(immediateRobotKeypadTransitions)
+
+            assert(shortestTransitions[KeyTransition('^', '<')]!!.size == 1)
+        }
+
+        @Test
+        fun `generateAllShortestTransitions should generate complete mappings given immediateRobotKeypadTransitions`() {
+            val shortestTransitions: Map<KeyTransition, Set<String>> = generateAllShortestTransitions(immediateRobotKeypadTransitions)
+
+            assert(shortestTransitions.size == 25)
+        }
+
+        @Test
+        fun `generateAllShortestTransitions should generate all of the shortest paths from left arrow to A given immediateRobotKeypadTransitions`() {
+            val shortestTransitions: Map<KeyTransition, Set<String>> = generateAllShortestTransitions(immediateRobotKeypadTransitions)
+
+            val expectedTransitions = setOf(
+                ">>^A",
+                ">^>A",
+            )
+
+            val transitions = shortestTransitions[KeyTransition('<', 'A')]
+            assert(transitions == expectedTransitions)
+        }
+
+        @Test
         fun `robotKeyboard should translate ^A into the correct sequence`() {
             val expectedOutput = "<A>A"
             val result :String = robotKeyboard("^A")
@@ -232,47 +254,6 @@ class Day21SolutionTest {
             val expectedOutput = "<vA>^A"
             val result = robotKeyboard("vA")
             assert(result == expectedOutput)
-        }
-
-        @Test
-        fun `robotKeyboard should encode all transitions to and from A into the correct sequence`() {
-            assert(robotKeyboard("AA") == "AA")
-            assert(robotKeyboard("^A") == "<A>A")
-            assert(robotKeyboard("<A") == "v<<A>>^A")
-            assert(robotKeyboard("vA") == "<vA>^A")
-            assert(robotKeyboard(">A") == "vA^A")
-        }
-
-        @Test
-        fun `robotKeyboard should encode all transitions from ^ into the correct sequence`() {
-            assert(robotKeyboard("^^A") == "<AA>A")
-            assert(robotKeyboard("^<A") == "<Av<A>>^A")
-            assert(robotKeyboard("^vA") == "<AvA>^A")
-            assert(robotKeyboard("^>A") == "<Av>A^A")
-        }
-
-        @Test
-        fun `robotKeyboard should encode all transitions from left arrow into the correct sequence`() {
-            assert(robotKeyboard("<^A") == "v<<A>^A>A")
-            assert(robotKeyboard("<<A") == "v<<AA>>^A")
-            assert(robotKeyboard("<vA") == "v<<A>A>^A")
-            assert(robotKeyboard("<>A") == "v<<A>>A^A")
-        }
-
-        @Test
-        fun `robotKeyboard should encode all transitions from v into the correct sequence`() {
-            assert(robotKeyboard("v^A") == "<vA^A>A")
-            assert(robotKeyboard("v<A") == "<vA<A>>^A")
-            assert(robotKeyboard("vvA") == "<vAA>^A")
-            assert(robotKeyboard("v>A") == "<vA>A^A")
-        }
-
-        @Test
-        fun `robotKeyboard should encode all transitions from right arrow into the correct sequence`() {
-            assert(robotKeyboard(">^A") == "vA<^A>A")
-            assert(robotKeyboard("><A") == "vA<<A>>^A")
-            assert(robotKeyboard(">vA") == "vA<A>^A")
-            assert(robotKeyboard(">>A") == "vAA^A")
         }
 
         @Test
