@@ -141,25 +141,25 @@ class Day21SolutionTest {
         }
 
         @Test
-        fun `doorKeyboard should translate 029A into the correct sequences`() {
+        fun `doorKeypad should be a Keypad`() {
+            val keypad: Keypad = ::doorKeypad
             val expectedOutput = "<A^A>^^AvvvA"
-            val result = doorKeyboard("029A")
-            assert(result == expectedOutput)
+            val result: Set<String> = keypad("029A")
+            assert(expectedOutput in result)
         }
 
         @Test
-        fun `doorKeyboard should translate 980A into the correct sequence`() {
+        fun `doorKeypad should translate 029A into the correct sequences`() {
+            val expectedOutput = "<A^A>^^AvvvA"
+            val result = doorKeypad("029A")
+            assert(expectedOutput in result)
+        }
+
+        @Test
+        fun `doorKeypad should translate 980A into the correct sequence`() {
             val expectedOutput = "^^^A<AvvvA>A"
-            val result = doorKeyboard("980A")
-            assert(result == expectedOutput)
-        }
-
-        @Test
-        fun `doorKeyboard should be a keyboard`() {
-            val keyboard: Keyboard = ::doorKeyboard
-            val expectedOutput = "<A^A>^^AvvvA"
-            val result = keyboard("029A")
-            assert(result == expectedOutput)
+            val result = doorKeypad("980A")
+            assert(expectedOutput in result)
         }
     }
 
@@ -188,7 +188,7 @@ class Day21SolutionTest {
                 remainingMap.forEach { second, value ->
                     try {
                         assert(immediateRobotKeypadTransitions[second]!![first]!! == opposites[value])
-                    } catch (e: NullPointerException) {
+                    } catch (_: NullPointerException) {
                         fail("Could not find reverse mapping from ${second} to ${first} (expected '${opposites[value]}')")
                     }
                 }
@@ -242,34 +242,25 @@ class Day21SolutionTest {
         }
 
         @Test
-        fun `robotKeyboard should translate ^A into the correct sequence`() {
+        fun `robotKeypad should translate ^A into the correct sequence`() {
             val expectedOutput = "<A>A"
-            val result :String = robotKeyboard("^A")
-            assert(result == expectedOutput)
+            val result : Set<String> = robotKeypad("^A")
+            assert(expectedOutput in result)
         }
 
-
         @Test
-        fun `robotKeyboard should translate vA into the correct sequence`() {
+        fun `robotKeypad should translate vA into the correct sequence`() {
             val expectedOutput = "<vA>^A"
-            val result = robotKeyboard("vA")
-            assert(result == expectedOutput)
+            val result = robotKeypad("vA")
+            assert(expectedOutput in result)
         }
 
         @Test
-        fun `robotKeyboard should be a keyboard`() {
-            val keyboard: Keyboard = ::robotKeyboard
+        fun `robotKeypad should be a keypad`() {
+            val keypad: Keypad = ::robotKeypad
             val expectedOutput = "<A>A"
-            val result = keyboard("^A")
-            assert(result == expectedOutput)
-        }
-
-        @Test
-        fun `robotKeyboardTransitions should have complete mappings`() {
-            assert(robotKeyboardTransitions.size == 25)
-            "A^v<>".forEach { char ->
-                assert(robotKeyboardTransitions[KeyTransition(char, char)] == "A")
-            }
+            val result = keypad("^A")
+            assert(expectedOutput in result)
         }
     }
 
@@ -277,24 +268,55 @@ class Day21SolutionTest {
     fun `decoding should work with multiple rounds`() {
         val initialValue = sampleDecodeRounds.last()
 
-        val firstIntermediateValue = doorKeyboard(initialValue)
-        assert(firstIntermediateValue == sampleDecodeRounds[2])
+        val firstIntermediateValues = doorKeypad(initialValue)
+        assert(sampleDecodeRounds[2] in firstIntermediateValues)
 
-        val secondIntermediateValue = robotKeyboard(firstIntermediateValue)
-        assert(secondIntermediateValue == sampleDecodeRounds[1])
+        val secondIntermediateValues = robotKeypad(sampleDecodeRounds[2])
+        assert(sampleDecodeRounds[1] in secondIntermediateValues)
 
-        val finalValue = robotKeyboard(secondIntermediateValue)
-        assert(finalValue == sampleDecodeRounds[0].replace("A<v<A", "Av<<A")) //sample uses a different final translation than I do
+        val finalValues = robotKeypad(sampleDecodeRounds[1])
+        assert(sampleDecodeRounds[0] in finalValues)
     }
 
     @Test
-    fun `translateAllKeyboards should translate through two robot keyboards and a door keyboard`() {
+    fun `translateAllKeypads should translate through two robot keyboards and a door keyboard and return the shortest results`() {
         val initialValue = sampleDecodeRounds.last()
-        val expectedResult = sampleDecodeRounds[0].replace("A<v<A", "Av<<A") //sample uses a different final translation than I do
+        val expectedResult = sampleDecodeRounds[0]
 
-        val result: String = translateAllKeyboards(initialValue)
+        val results: Set<String> = translateAllKeypads(initialValue)
 
-        assert(result == expectedResult)
+        assert(expectedResult in results)
+    }
+
+    @Test
+    fun `translateAllKeypads should return the shortest sequences of button presses that will work`() {
+        val initialValue = sampleDecodeRounds.last()
+        val expectedResultLength = sampleDecodeRounds[0].length
+
+        val results: Set<String> = translateAllKeypads(initialValue)
+
+        assert(results.all { it.length == expectedResultLength })
+    }
+
+    @Test
+    fun `translateAllKeypads should return the shortest sequences of buttons presses for all sample inputs`() {
+        shortestPresses.forEach { initialValue, expectedResult ->
+            val results: Set<String> = translateAllKeypads(initialValue)
+            assert(expectedResult in results)
+        }
+    }
+    
+    @Test
+    fun `calculatePart1Complexity should return the product of the shortest sequence of button pushes for the code and the code`() {
+        assert(calculatePart1Complexity("029A") == 68 * 29)
+        assert(calculatePart1Complexity("980A") == 60 * 980)
+        assert(calculatePart1Complexity("179A") == 68 * 179)
+        assert(calculatePart1Complexity("456A") == 64 * 456)
+        assert(calculatePart1Complexity("379A") == 64 * 379)
+    }
+    
+    @Test
+    fun `part1 should return the sum of the complexities of the input`() {
+        assert(solution.part1(sampleInput) == 126384L)
     }
 }
-
