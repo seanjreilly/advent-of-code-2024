@@ -21,56 +21,6 @@ internal fun calculatePart2Complexity(code: String): Long {
     return robotKeypad(code, 25, 0) * code.dropLast(1).toLong()
 }
 
-val immediateDoorKeypadTransitions: Map<Char, Map<Char, Char>> = mapOf(
-    'A' to mapOf('0' to '<', '3' to '^'),
-    '0' to mapOf('2' to '^', 'A' to '>'),
-    '1' to mapOf('4' to '^', '2' to '>'),
-    '2' to mapOf('1' to '<', '5' to '^', '3' to '>', '0' to 'v'),
-    '3' to mapOf('2' to '<', '6' to '^', 'A' to 'v'),
-    '4' to mapOf('7' to '^', '5' to '>', '1' to 'v'),
-    '5' to mapOf('4' to '<', '8' to '^', '6' to '>', '2' to 'v'),
-    '6' to mapOf('5' to '<', '9' to '^', '3' to 'v'),
-    '7' to mapOf('8' to '>', '4' to 'v'),
-    '8' to mapOf('7' to '<', '9' to '>', '5' to 'v'),
-    '9' to mapOf('8' to '<', '6' to 'v')
-)
-
-val completeDoorKeypadTransitions = generateAllShortestTransitions(immediateDoorKeypadTransitions)
-
-fun doorKeypad(input: String) : Set<String> {
-    var results = listOf("")
-    var currentPosition = 'A'
-    input.forEach { newPosition ->
-        val transition = KeyTransition(currentPosition, newPosition)
-        val newSegments = completeDoorKeypadTransitions[transition]!!
-        results = results.flatMap { oldResult -> newSegments.map { oldResult + it } }
-        currentPosition = newPosition
-    }
-    return results.toSet()
-}
-
-val immediateRobotKeypadTransitions: Map<Char, Map<Char, Char>> = mapOf(
-    'A' to mapOf('^' to '<', '>' to 'v'),
-    '^' to mapOf('A' to '>', 'v' to 'v'),
-    '>' to mapOf('A' to '^', 'v' to '<'),
-    'v' to mapOf('^' to '^', '<' to '<', '>' to '>'),
-    '<' to mapOf('v' to '>')
-)
-
-val completeRobotKeypadTransitions = generateAllShortestTransitions(immediateRobotKeypadTransitions)
-
-fun robotKeypad(input: String) : Set<String> {
-    var results = listOf("")
-    var currentPosition = 'A'
-    input.forEach { newPosition ->
-        val transition = KeyTransition(currentPosition, newPosition)
-        val newSegments = completeRobotKeypadTransitions[transition]!!
-        results = results.flatMap { oldResult -> newSegments.map { oldResult + it } }
-        currentPosition = newPosition
-    }
-    return results.toSet()
-}
-
 val cache = mutableMapOf<CacheKey, Long>()
 data class CacheKey(val input: String, val rounds: Int, val currentRound: Int)
 
@@ -88,6 +38,45 @@ fun robotKeypad(input: String, rounds: Int, currentRound: Int) : Long {
                 segments.sumOf { segment -> robotKeypad(segment, rounds, currentRound + 1) }
             }
     }
+}
+
+fun doorKeypad(input: String) = keypad(input, completeDoorKeypadTransitions)
+fun robotKeypad(input: String) = keypad(input, completeRobotKeypadTransitions)
+
+val immediateDoorKeypadTransitions: Map<Char, Map<Char, Char>> = mapOf(
+    'A' to mapOf('0' to '<', '3' to '^'),
+    '0' to mapOf('2' to '^', 'A' to '>'),
+    '1' to mapOf('4' to '^', '2' to '>'),
+    '2' to mapOf('1' to '<', '5' to '^', '3' to '>', '0' to 'v'),
+    '3' to mapOf('2' to '<', '6' to '^', 'A' to 'v'),
+    '4' to mapOf('7' to '^', '5' to '>', '1' to 'v'),
+    '5' to mapOf('4' to '<', '8' to '^', '6' to '>', '2' to 'v'),
+    '6' to mapOf('5' to '<', '9' to '^', '3' to 'v'),
+    '7' to mapOf('8' to '>', '4' to 'v'),
+    '8' to mapOf('7' to '<', '9' to '>', '5' to 'v'),
+    '9' to mapOf('8' to '<', '6' to 'v')
+)
+val completeDoorKeypadTransitions = generateAllShortestTransitions(immediateDoorKeypadTransitions)
+
+val immediateRobotKeypadTransitions: Map<Char, Map<Char, Char>> = mapOf(
+    'A' to mapOf('^' to '<', '>' to 'v'),
+    '^' to mapOf('A' to '>', 'v' to 'v'),
+    '>' to mapOf('A' to '^', 'v' to '<'),
+    'v' to mapOf('^' to '^', '<' to '<', '>' to '>'),
+    '<' to mapOf('v' to '>')
+)
+val completeRobotKeypadTransitions = generateAllShortestTransitions(immediateRobotKeypadTransitions)
+
+private fun keypad(input: String, transitions: Map<KeyTransition, Set<String>>): Set<String> {
+    var results = listOf("")
+    var currentPosition = 'A'
+    input.forEach { newPosition ->
+        val transition = KeyTransition(currentPosition, newPosition)
+        val newSegments = transitions[transition]!!
+        results = results.flatMap { oldResult -> newSegments.map { oldResult + it } }
+        currentPosition = newPosition
+    }
+    return results.toSet()
 }
 
 internal fun generateAllShortestTransitions(immediateTransitions: Map<Char, Map<Char, Char>>): Map<KeyTransition, Set<String>> {
