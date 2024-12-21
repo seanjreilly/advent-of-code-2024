@@ -277,34 +277,6 @@ class Day21SolutionTest {
         val finalValues = robotKeypad(sampleDecodeRounds[1])
         assert(sampleDecodeRounds[0] in finalValues)
     }
-
-    @Test
-    fun `translateAllKeypads should translate through two robot keyboards and a door keyboard and return the shortest results`() {
-        val initialValue = sampleDecodeRounds.last()
-        val expectedResult = sampleDecodeRounds[0]
-
-        val results: Set<String> = translateAllKeypads(initialValue)
-
-        assert(expectedResult in results)
-    }
-
-    @Test
-    fun `translateAllKeypads should return the shortest sequences of button presses that will work`() {
-        val initialValue = sampleDecodeRounds.last()
-        val expectedResultLength = sampleDecodeRounds[0].length
-
-        val results: Set<String> = translateAllKeypads(initialValue)
-
-        assert(results.all { it.length == expectedResultLength })
-    }
-
-    @Test
-    fun `translateAllKeypads should return the shortest sequences of buttons presses for all sample inputs`() {
-        shortestPresses.forEach { initialValue, expectedResult ->
-            val results: Set<String> = translateAllKeypads(initialValue)
-            assert(expectedResult in results)
-        }
-    }
     
     @Test
     fun `calculatePart1Complexity should return the product of the shortest sequence of button pushes for the code and the code`() {
@@ -318,5 +290,22 @@ class Day21SolutionTest {
     @Test
     fun `part1 should return the sum of the complexities of the input`() {
         assert(solution.part1(sampleInput) == 126384L)
+    }
+
+    @Test
+    fun `dynamic programming approach should should translate through multiple robot keypads and a door keypad and return the length of the shortest sequence`() {
+        assert(robotKeypad("029A", 2, 0) == 68L)
+        assert(robotKeypad("980A", 2, 0) == 60L)
+        assert(robotKeypad("179A", 2, 0) == 68L)
+        assert(robotKeypad("456A", 2, 0) == 64L)
+        assert(robotKeypad("379A", 2, 0) == 64L)
+    }
+
+    @Test
+    fun `dynamic programming approach should return the shortest sequences of buttons presses for all sample inputs`() {
+        shortestPresses.forEach { initialValue, expectedResult ->
+            val result = robotKeypad(initialValue, 2, 0)
+            assert(result == expectedResult.length.toLong())
+        }
     }
 }

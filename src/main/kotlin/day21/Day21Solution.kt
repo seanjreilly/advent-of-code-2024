@@ -12,14 +12,7 @@ class Day21Solution : LongSolution() {
 }
 
 internal fun calculatePart1Complexity(code: String): Int {
-    return translateAllKeypads(code).first().length * code.dropLast(1).toInt()
-}
-
-internal fun translateAllKeypads(input: String): Set<String> {
-    val rounds: List<Keypad> = listOf(::doorKeypad, ::robotKeypad, ::robotKeypad)
-    val allResults = rounds.fold(setOf(input)) { initialValues, operation -> initialValues.flatMap { operation(it) }.toSet() }
-    val shortestResultLength = allResults.minOf { it.length }
-    return allResults.filter { it.length == shortestResultLength }.toSet()
+    return robotKeypad(code, 2, 0).toInt() * code.dropLast(1).toInt()
 }
 
 val immediateDoorKeypadTransitions: Map<Char, Map<Char, Char>> = mapOf(
@@ -70,6 +63,20 @@ fun robotKeypad(input: String) : Set<String> {
         currentPosition = newPosition
     }
     return results.toSet()
+}
+
+fun robotKeypad(input: String, rounds: Int, currentRound: Int) : Long {
+    val keypad: Keypad = if (currentRound == 0) { ::doorKeypad } else { ::robotKeypad }
+    val paths = keypad(input)
+    if (currentRound == rounds) {
+        return paths.minOf { it.length }.toLong()
+    }
+    return keypad(input)
+        .minOf { path ->
+            //break into segments and recurse on each segment (the lower keypad will reset its state once A is pressed)
+            val segments = path.split('A').dropLast(1).map { it + 'A' }
+            segments.sumOf { segment -> robotKeypad(segment, rounds, currentRound + 1) }
+        }
 }
 
 internal fun generateAllShortestTransitions(immediateTransitions: Map<Char, Map<Char, Char>>): Map<KeyTransition, Set<String>> {
