@@ -2,8 +2,10 @@ package day21
 
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.fail
 import java.lang.NullPointerException
+import java.util.concurrent.TimeUnit
 
 class Day21SolutionTest {
     private val sampleInput = """
@@ -63,7 +65,7 @@ class Day21SolutionTest {
                 remainingMap.forEach { second, value ->
                     try {
                         assert(immediateDoorKeypadTransitions[second]!![first]!! == opposites[value])
-                    } catch (e: NullPointerException) {
+                    } catch (_: NullPointerException) {
                         fail("Could not find reverse mapping from ${second} to ${first} (expected '${opposites[value]}')")
                     }
                 }
@@ -288,11 +290,6 @@ class Day21SolutionTest {
     }
     
     @Test
-    fun `part1 should return the sum of the complexities of the input`() {
-        assert(solution.part1(sampleInput) == 126384L)
-    }
-
-    @Test
     fun `dynamic programming approach should should translate through multiple robot keypads and a door keypad and return the length of the shortest sequence`() {
         assert(robotKeypad("029A", 2, 0) == 68L)
         assert(robotKeypad("980A", 2, 0) == 60L)
@@ -307,5 +304,34 @@ class Day21SolutionTest {
             val result = robotKeypad(initialValue, 2, 0)
             assert(result == expectedResult.length.toLong())
         }
+    }
+
+    @Timeout(1, unit = TimeUnit.SECONDS)
+    @Test
+    fun `dynamic programming approach should should work with 25 rounds of robot keypads and a door keypad and return the length of the shortest sequence`() {
+        assert(robotKeypad("029A", 25, 0) == 82050061710L)
+        assert(robotKeypad("980A", 25, 0) == 72242026390L)
+        assert(robotKeypad("179A", 25, 0) == 81251039228L)
+        assert(robotKeypad("456A", 25, 0) == 80786362258L)
+        assert(robotKeypad("379A", 25, 0) == 77985628636L)
+    }
+
+    @Test
+    fun `calculatePart2Complexity should return the product of the shortest sequence of button pushe with 25 rounds for the code and the code`() {
+        assert(calculatePart2Complexity("029A") == 82050061710L * 29L)
+        assert(calculatePart2Complexity("980A") == 72242026390L * 980L)
+        assert(calculatePart2Complexity("179A") == 81251039228L * 179L)
+        assert(calculatePart2Complexity("456A") == 80786362258L * 456L)
+        assert(calculatePart2Complexity("379A") == 77985628636L * 379L)
+    }
+
+    @Test
+    fun `part1 should return the sum of the complexities of the input with 2 robot keypads`() {
+        assert(solution.part1(sampleInput) == 126384L)
+    }
+
+    @Test
+    fun `part2 should return the sum of the complexities of the input with 25 robot keypads`() {
+        assert(solution.part2(sampleInput) == 154115708116294L)
     }
 }

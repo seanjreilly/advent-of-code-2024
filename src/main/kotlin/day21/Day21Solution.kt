@@ -8,11 +8,17 @@ class Day21Solution : LongSolution() {
         return input.sumOf { calculatePart1Complexity(it) }.toLong()
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>): Long {
+        return input.sumOf { calculatePart2Complexity(it) }
+    }
 }
 
 internal fun calculatePart1Complexity(code: String): Int {
     return robotKeypad(code, 2, 0).toInt() * code.dropLast(1).toInt()
+}
+
+internal fun calculatePart2Complexity(code: String): Long {
+    return robotKeypad(code, 25, 0) * code.dropLast(1).toLong()
 }
 
 val immediateDoorKeypadTransitions: Map<Char, Map<Char, Char>> = mapOf(
@@ -65,18 +71,23 @@ fun robotKeypad(input: String) : Set<String> {
     return results.toSet()
 }
 
+val cache = mutableMapOf<CacheKey, Long>()
+data class CacheKey(val input: String, val rounds: Int, val currentRound: Int)
+
 fun robotKeypad(input: String, rounds: Int, currentRound: Int) : Long {
     val keypad: Keypad = if (currentRound == 0) { ::doorKeypad } else { ::robotKeypad }
-    val paths = keypad(input)
-    if (currentRound == rounds) {
-        return paths.minOf { it.length }.toLong()
-    }
-    return keypad(input)
-        .minOf { path ->
-            //break into segments and recurse on each segment (the lower keypad will reset its state once A is pressed)
-            val segments = path.split('A').dropLast(1).map { it + 'A' }
-            segments.sumOf { segment -> robotKeypad(segment, rounds, currentRound + 1) }
+    return cache.getOrPut(CacheKey(input, rounds, currentRound)) {
+        val paths = keypad(input)
+        if (currentRound == rounds) {
+            return@getOrPut paths.minOf { it.length }.toLong()
         }
+        return@getOrPut keypad(input)
+            .minOf { path ->
+                //break into segments and recurse on each segment (the lower keypad will reset its state once A is pressed)
+                val segments = path.split('A').dropLast(1).map { it + 'A' }
+                segments.sumOf { segment -> robotKeypad(segment, rounds, currentRound + 1) }
+            }
+    }
 }
 
 internal fun generateAllShortestTransitions(immediateTransitions: Map<Char, Map<Char, Char>>): Map<KeyTransition, Set<String>> {
