@@ -135,17 +135,7 @@ internal val doorKeyboardTransitions = mapOf(
     KeyTransition('9', '9') to "A",
 )
 
-internal fun doorKeyboard(input: String): String {
-    var result = ""
-    var currentPosition = 'A'
-    input.forEach { newPosition ->
-        val transition = KeyTransition(currentPosition, newPosition)
-        result += doorKeyboardTransitions[transition]!!.replace("*", "") //remove notes to self
-        currentPosition = newPosition
-    }
-
-    return result
-}
+internal fun doorKeyboard(input: String) = translate(input, doorKeyboardTransitions)
 
 internal val robotKeyboardTransitions = mapOf(
     KeyTransition('A', 'A') to "A",
@@ -175,15 +165,16 @@ internal val robotKeyboardTransitions = mapOf(
     KeyTransition('>', '>') to "A",
 )
 
-internal fun robotKeyboard(input: String): String {
+internal fun robotKeyboard(input: String) = translate(input, robotKeyboardTransitions)
+
+private fun translate(input: String, transitionMap: Map<KeyTransition, String>): String {
     var result = ""
     var currentPosition = 'A'
     input.forEach { newPosition ->
         val transition = KeyTransition(currentPosition, newPosition)
-        result += robotKeyboardTransitions[transition]!!.replace("*", "") //remove notes to self
+        result += transitionMap[transition]!!.replace("*", "") //remove notes to self
         currentPosition = newPosition
     }
-
     return result
 }
 
