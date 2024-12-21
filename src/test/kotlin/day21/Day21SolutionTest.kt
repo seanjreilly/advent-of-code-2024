@@ -229,7 +229,7 @@ class Day21SolutionTest {
 
         @Test
         fun `robotKeyboard should translate vA into the correct sequence`() {
-            val expectedOutput = "<vA^>A"
+            val expectedOutput = "<vA>^A"
             val result = robotKeyboard("vA")
             assert(result == expectedOutput)
         }
@@ -239,7 +239,7 @@ class Day21SolutionTest {
             assert(robotKeyboard("AA") == "AA")
             assert(robotKeyboard("^A") == "<A>A")
             assert(robotKeyboard("<A") == "v<<A>>^A")
-            assert(robotKeyboard("vA") == "<vA^>A")
+            assert(robotKeyboard("vA") == "<vA>^A")
             assert(robotKeyboard(">A") == "vA^A")
         }
 
@@ -247,7 +247,7 @@ class Day21SolutionTest {
         fun `robotKeyboard should encode all transitions from ^ into the correct sequence`() {
             assert(robotKeyboard("^^A") == "<AA>A")
             assert(robotKeyboard("^<A") == "<Av<A>>^A")
-            assert(robotKeyboard("^vA") == "<AvA^>A")
+            assert(robotKeyboard("^vA") == "<AvA>^A")
             assert(robotKeyboard("^>A") == "<Av>A^A")
         }
 
@@ -255,7 +255,7 @@ class Day21SolutionTest {
         fun `robotKeyboard should encode all transitions from left arrow into the correct sequence`() {
             assert(robotKeyboard("<^A") == "v<<A>^A>A")
             assert(robotKeyboard("<<A") == "v<<AA>>^A")
-            assert(robotKeyboard("<vA") == "v<<A>A^>A")
+            assert(robotKeyboard("<vA") == "v<<A>A>^A")
             assert(robotKeyboard("<>A") == "v<<A>>A^A")
         }
 
@@ -263,7 +263,7 @@ class Day21SolutionTest {
         fun `robotKeyboard should encode all transitions from v into the correct sequence`() {
             assert(robotKeyboard("v^A") == "<vA^A>A")
             assert(robotKeyboard("v<A") == "<vA<A>>^A")
-            assert(robotKeyboard("vvA") == "<vAA^>A")
+            assert(robotKeyboard("vvA") == "<vAA>^A")
             assert(robotKeyboard("v>A") == "<vA>A^A")
         }
 
@@ -271,7 +271,7 @@ class Day21SolutionTest {
         fun `robotKeyboard should encode all transitions from right arrow into the correct sequence`() {
             assert(robotKeyboard(">^A") == "vA<^A>A")
             assert(robotKeyboard("><A") == "vA<<A>>^A")
-            assert(robotKeyboard(">vA") == "vA<A^>A")
+            assert(robotKeyboard(">vA") == "vA<A>^A")
             assert(robotKeyboard(">>A") == "vAA^A")
         }
 
@@ -290,6 +290,18 @@ class Day21SolutionTest {
                 assert(robotKeyboardTransitions[KeyTransition(char, char)] == "A")
             }
         }
+    }
+
+    @Test
+    fun `decoding should work with multiple rounds`() {
+        val initialValue = sampleDecodeRounds.last()
+
+        val firstIntermediateValue = doorKeyboard(initialValue)
+        assert(firstIntermediateValue == sampleDecodeRounds[2])
+
+        val secondIntermediateValue = robotKeyboard(firstIntermediateValue)
+        assert(secondIntermediateValue == sampleDecodeRounds[1])
+
     }
 }
 

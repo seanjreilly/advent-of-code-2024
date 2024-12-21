@@ -153,7 +153,7 @@ internal val robotKeyboardTransitions = mapOf(
     KeyTransition('<', '<') to "A",
     KeyTransition('<', 'v') to ">A",
     KeyTransition('<', '>') to ">>A",
-    KeyTransition('v', 'A') to "^>A*",
+    KeyTransition('v', 'A') to ">^A*",
     KeyTransition('v', '^') to "^A",
     KeyTransition('v', '<') to "<A",
     KeyTransition('v', 'v') to "A",
