@@ -302,6 +302,18 @@ class Day21SolutionTest {
         val secondIntermediateValue = robotKeyboard(firstIntermediateValue)
         assert(secondIntermediateValue == sampleDecodeRounds[1])
 
+        val finalValue = robotKeyboard(secondIntermediateValue)
+        assert(finalValue == sampleDecodeRounds[0].replace("A<v<A", "Av<<A")) //sample uses a different final translation than I do
+    }
+
+    @Test
+    fun `translateAllKeyboards should translate through two robot keyboards and a door keyboard`() {
+        val initialValue = sampleDecodeRounds.last()
+        val expectedResult = sampleDecodeRounds[0].replace("A<v<A", "Av<<A") //sample uses a different final translation than I do
+
+        val result: String = translateAllKeyboards(initialValue)
+
+        assert(result == expectedResult)
     }
 }
 

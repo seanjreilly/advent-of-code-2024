@@ -11,6 +11,11 @@ class Day21Solution : LongSolution() {
     override fun part2(input: List<String>) = 0L
 }
 
+internal fun translateAllKeyboards(input: String): String {
+    val rounds: List<Keyboard> = listOf(::doorKeyboard, ::robotKeyboard, ::robotKeyboard)
+    return rounds.fold(input) { initial, operation -> operation(initial) }
+}
+
 internal val doorKeyboardTransitions = mapOf(
     KeyTransition('A', 'A') to "A",
     KeyTransition('A', '0') to "<A",
