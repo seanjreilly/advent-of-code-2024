@@ -147,5 +147,45 @@ internal fun doorKeyboard(input: String): String {
     return result
 }
 
+internal val robotKeyboardTransitions = mapOf(
+    KeyTransition('A', 'A') to "A",
+    KeyTransition('A', '^') to "<A",
+    KeyTransition('A', '<') to "v<<A*",
+    KeyTransition('A', 'v') to "<vA*",
+    KeyTransition('A', '>') to "vA",
+    KeyTransition('^', 'A') to ">A",
+    KeyTransition('^', '^') to "A",
+    KeyTransition('^', '<') to "v<A***",
+    KeyTransition('^', 'v') to "vA",
+    KeyTransition('^', '>') to "v>A*",
+    KeyTransition('<', 'A') to ">>^A***",
+    KeyTransition('<', '^') to ">^A***",
+    KeyTransition('<', '<') to "A",
+    KeyTransition('<', 'v') to ">A",
+    KeyTransition('<', '>') to ">>A",
+    KeyTransition('v', 'A') to "^>A*",
+    KeyTransition('v', '^') to "^A",
+    KeyTransition('v', '<') to "<A",
+    KeyTransition('v', 'v') to "A",
+    KeyTransition('v', '>') to ">A",
+    KeyTransition('>', 'A') to "^A",
+    KeyTransition('>', '^') to "<^A*",
+    KeyTransition('>', '<') to "<<A",
+    KeyTransition('>', 'v') to "<A",
+    KeyTransition('>', '>') to "A",
+)
+
+internal fun robotKeyboard(input: String): String {
+    var result = ""
+    var currentPosition = 'A'
+    input.forEach { newPosition ->
+        val transition = KeyTransition(currentPosition, newPosition)
+        result += robotKeyboardTransitions[transition]!!.replace("*", "") //remove notes to self
+        currentPosition = newPosition
+    }
+
+    return result
+}
+
 data class KeyTransition(val fromKey: Char, val toKey: Char)
 typealias Keyboard = (String) -> String
