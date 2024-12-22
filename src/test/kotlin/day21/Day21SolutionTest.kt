@@ -281,12 +281,12 @@ class Day21SolutionTest {
     }
     
     @Test
-    fun `calculatePart1Complexity should return the product of the shortest sequence of button pushes for the code and the code`() {
-        assert(calculatePart1Complexity("029A") == 68 * 29)
-        assert(calculatePart1Complexity("980A") == 60 * 980)
-        assert(calculatePart1Complexity("179A") == 68 * 179)
-        assert(calculatePart1Complexity("456A") == 64 * 456)
-        assert(calculatePart1Complexity("379A") == 64 * 379)
+    fun `calculateComplexity should return the product of the shortest sequence of button pushes for the code and the code`() {
+        assert(calculateComplexity("029A", 2) == 68L * 29L)
+        assert(calculateComplexity("980A", 2) == 60L * 980L)
+        assert(calculateComplexity("179A", 2) == 68L * 179L)
+        assert(calculateComplexity("456A", 2) == 64L * 456L)
+        assert(calculateComplexity("379A", 2) == 64L * 379L)
     }
     
     @Test
@@ -317,12 +317,12 @@ class Day21SolutionTest {
     }
 
     @Test
-    fun `calculatePart2Complexity should return the product of the shortest sequence of button pushe with 25 rounds for the code and the code`() {
-        assert(calculatePart2Complexity("029A") == 82050061710L * 29L)
-        assert(calculatePart2Complexity("980A") == 72242026390L * 980L)
-        assert(calculatePart2Complexity("179A") == 81251039228L * 179L)
-        assert(calculatePart2Complexity("456A") == 80786362258L * 456L)
-        assert(calculatePart2Complexity("379A") == 77985628636L * 379L)
+    fun `calculateComplexity should return the product of the shortest sequence of button pushe with 25 rounds for the code and the code`() {
+        assert(calculateComplexity("029A", 25) == 82050061710L * 29L)
+        assert(calculateComplexity("980A", 25) == 72242026390L * 980L)
+        assert(calculateComplexity("179A", 25) == 81251039228L * 179L)
+        assert(calculateComplexity("456A", 25) == 80786362258L * 456L)
+        assert(calculateComplexity("379A", 25) == 77985628636L * 379L)
     }
 
     @Test

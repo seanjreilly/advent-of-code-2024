@@ -4,21 +4,12 @@ import utils.LongSolution
 
 fun main() = Day21Solution().run()
 class Day21Solution : LongSolution() {
-    override fun part1(input: List<String>): Long {
-        return input.sumOf { calculatePart1Complexity(it) }.toLong()
-    }
-
-    override fun part2(input: List<String>): Long {
-        return input.sumOf { calculatePart2Complexity(it) }
-    }
+    override fun part1(input: List<String>) = input.sumOf { calculateComplexity(it, 2) }
+    override fun part2(input: List<String>) = input.sumOf { calculateComplexity(it, 25) }
 }
 
-internal fun calculatePart1Complexity(code: String): Int {
-    return robotKeypad(code, 2, 0).toInt() * code.dropLast(1).toInt()
-}
-
-internal fun calculatePart2Complexity(code: String): Long {
-    return robotKeypad(code, 25, 0) * code.dropLast(1).toLong()
+internal fun calculateComplexity(code: String, rounds: Int): Long {
+    return robotKeypad(code, rounds, 0) * code.dropLast(1).toLong()
 }
 
 val cache = mutableMapOf<CacheKey, Long>()
@@ -117,12 +108,8 @@ internal fun generateAllShortestTransitions(immediateTransitions: Map<Char, Map<
     }
 
     val result = mutableMapOf<KeyTransition, Set<String>>()
-    result += immediateTransitions.keys.associate { KeyTransition(it, it) to setOf("A") }
-
-    immediateTransitions.keys.forEach { from ->
-        result += findShortestMappings(from)
-    }
-
+    immediateTransitions.keys.associateTo(result) { KeyTransition(it, it) to setOf("A") }
+    immediateTransitions.keys.forEach { result += findShortestMappings(it) }
     return result
 }
 
