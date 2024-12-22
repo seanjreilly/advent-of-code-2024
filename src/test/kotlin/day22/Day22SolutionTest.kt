@@ -128,6 +128,20 @@ class Day22SolutionTest {
     }
 
     @Test
+    fun `removeDuplicates should PriceChanges that don't earn bananas`() {
+        val input = listOf(
+            PriceChangePattern(-3, 6, -1, -1) to 4L,
+            PriceChangePattern(6, -1, -1, 0) to 4L,
+            PriceChangePattern(-1, -1, 0, 2) to 0L,
+        )
+        val expectedResult = input.take(2).toMap()
+
+        val result: Map<PriceChangePattern, Long> = removeDuplicates(input)
+
+        assert(result == expectedResult)
+    }
+
+    @Test
     fun `merge should combine two price maps into a single price map with the sum of bananas each price change would earn`() {
         val firstMap = mapOf(
             PriceChangePattern(1,2,3,4) to 4L,

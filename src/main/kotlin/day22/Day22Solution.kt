@@ -31,21 +31,21 @@ internal fun merge(first: Map<PriceChangePattern, Long>, second: Map<PriceChange
 }
 
 internal fun removeDuplicates(prices: List<Pair<PriceChangePattern, Long>>): Map<PriceChangePattern, Long> {
-    return prices.asReversed().associate { it }
+    return prices.asReversed().filter { it.second != 0L }.associate { it }
 }
 
 internal fun findChangesAndPrices(secretNumber: Long, rounds: Int): List<Pair<PriceChangePattern, Long>> {
-    val prices = mutableListOf<Int>(secretNumber.mod(10))
+    val prices = mutableListOf<Long>(secretNumber.mod(10).toLong())
 
     var currentSecretNumber = secretNumber
     var roundsRemaining = rounds
     do {
         currentSecretNumber = nextSecretNumber(currentSecretNumber)
-        prices += currentSecretNumber.mod(10)
+        prices += currentSecretNumber.mod(10).toLong()
         roundsRemaining--
     } while (roundsRemaining > 0)
 
-    fun convertWindow(window: List<Int>) : Pair<PriceChangePattern, Long> {
+    fun convertWindow(window: List<Long>) : Pair<PriceChangePattern, Long> {
         val window_1 = window[1]
         val window_2 = window[2]
         val window_3 = window[3]
