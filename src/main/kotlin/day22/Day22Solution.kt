@@ -10,15 +10,16 @@ class Day22Solution : LongSolution() {
             .sumOf { nextSecretNumberAfterNRounds(it, 2000) }
     }
 
-    override fun part2(input: List<String>): Long {
-        return findBestPriceChange(input.map { it.toLong() }).second
-    }
+    override fun part2(input: List<String>) = findBestPriceChange(input.map { it.toLong() }).second
 }
 
 internal fun findBestPriceChange(secretNumbers: List<Long>): Pair<PriceChangePattern, Long> {
     return secretNumbers
-        .map { removeDuplicates(findChangesAndPrices(it, 2000)) }
+        .parallelStream()
+        .map { findChangesAndPrices(it, 2000) }
+        .map(::removeDuplicates)
         .reduce(::merge)
+        .get()
         .maxBy { it.value }
         .toPair()
 }
