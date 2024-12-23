@@ -17,7 +17,11 @@ internal fun containNodeStartingWithT(nodeSets: Set<Set<String>>): Collection<Se
 }
 
 internal fun findSetsOfThree(input: List<String>): Set<Set<String>> {
-    val rawEdges: List<Pair<String,String>> = input
+    return findBiDirectionalEdgesAndSetsOfThree(input).second
+}
+
+private fun findBiDirectionalEdgesAndSetsOfThree(input: List<String>): Pair<MutableMap<String, Set<String>>, Set<Set<String>>> {
+    val rawEdges: List<Pair<String, String>> = input
         .map { it.split('-') }
         .map { (first, second) -> first to second }
 
@@ -33,7 +37,7 @@ internal fun findSetsOfThree(input: List<String>): Set<Set<String>> {
             biDirectionalEdges.merge(key, values, Set<String>::plus)
         }
 
-    return biDirectionalEdges.keys.flatMap { startNode ->
+    val setsOfThree = biDirectionalEdges.keys.flatMap { startNode ->
         biDirectionalEdges[startNode]!!.twoElementCombinations()
             .mapNotNull { (first, second) ->
                 when (second in biDirectionalEdges[first]!!) {
@@ -42,4 +46,6 @@ internal fun findSetsOfThree(input: List<String>): Set<Set<String>> {
                 }
             }
     }.toSet()
+
+    return biDirectionalEdges to setsOfThree
 }
