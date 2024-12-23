@@ -2,6 +2,7 @@ package day23
 
 import utils.StringSolution
 import utils.twoElementCombinations
+import java.util.stream.Collectors.toSet
 
 fun main() = Day23Solution().run()
 class Day23Solution : StringSolution() {
@@ -21,11 +22,14 @@ internal fun findLargestFullyConnectedSet(input: List<String>): Set<String> {
 
     var currentGeneration: Set<Set<String>> = setsOfThree
     while (currentGeneration.size > 1) {
-        currentGeneration = edges.entries.flatMap { (key, values) ->
-            currentGeneration
-                .filter { set -> values.containsAll(set) }
-                .map { set -> set + key }
-        }.toSet()
+        currentGeneration = edges.entries
+            .parallelStream()
+            .flatMap { (key, values) ->
+                currentGeneration
+                    .parallelStream()
+                    .filter { set -> values.containsAll(set) }
+                    .map { set -> set + key }
+            }.collect(toSet())
     }
     return currentGeneration.first()
 }
