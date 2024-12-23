@@ -85,8 +85,22 @@ class Day23SolutionTest {
     }
 
     @Test
+    fun `findLargestFullyConnectedSet should return the largest fully connected set of nodes in the graph given a list of bidirectional edges`() {
+        val expectedResult = setOf("co", "de", "ka", "ta")
+
+        val result: Set<String> = findLargestFullyConnectedSet(sampleInput)
+
+        assert(result == expectedResult)
+    }
+
+    @Test
     fun `part1 should return the number of connected sets of 3 nodes containing at least one node starting with t`() {
-        assert(solution.part1(sampleInput) == 7L)
+        assert(solution.part1(sampleInput) == "7")
+    }
+
+    @Test
+    fun `part2 should return the largest connected set sorted alphabetically, joined by commas`() {
+        assert(solution.part2(sampleInput) == "co,de,ka,ta")
     }
 
     private fun toSetOfSets(input: List<String>): Set<Set<String>> {

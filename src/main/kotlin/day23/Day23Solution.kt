@@ -1,15 +1,33 @@
 package day23
 
-import utils.LongSolution
+import utils.StringSolution
 import utils.twoElementCombinations
 
 fun main() = Day23Solution().run()
-class Day23Solution : LongSolution() {
-    override fun part1(input: List<String>): Long {
-        return containNodeStartingWithT(findSetsOfThree(input)).count().toLong()
+class Day23Solution : StringSolution() {
+    override fun part1(input: List<String>): String {
+        return containNodeStartingWithT(findSetsOfThree(input)).count().toString()
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>): String {
+        return findLargestFullyConnectedSet(input)
+            .sorted()
+            .joinToString(",")
+    }
+}
+
+internal fun findLargestFullyConnectedSet(input: List<String>): Set<String> {
+    val (edges, setsOfThree) = findBiDirectionalEdgesAndSetsOfThree(input)
+
+    var currentGeneration: Set<Set<String>> = setsOfThree
+    while (currentGeneration.size > 1) {
+        currentGeneration = edges.entries.flatMap { (key, values) ->
+            currentGeneration
+                .filter { set -> values.containsAll(set) }
+                .map { set -> set + key }
+        }.toSet()
+    }
+    return currentGeneration.first()
 }
 
 internal fun containNodeStartingWithT(nodeSets: Set<Set<String>>): Collection<Set<String>> {
