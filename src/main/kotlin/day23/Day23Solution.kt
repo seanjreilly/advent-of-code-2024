@@ -1,8 +1,10 @@
 package day23
 
+import org.jgrapht.alg.clique.BronKerboschCliqueFinder
+import org.jgrapht.graph.DefaultEdge
+import org.jgrapht.graph.SimpleGraph
 import utils.StringSolution
 import utils.twoElementCombinations
-import java.util.stream.Collectors.toSet
 
 fun main() = Day23Solution().run()
 class Day23Solution : StringSolution() {
@@ -18,20 +20,15 @@ class Day23Solution : StringSolution() {
 }
 
 internal fun findLargestFullyConnectedSet(input: List<String>): Set<String> {
-    val (edges, setsOfThree) = findBiDirectionalEdgesAndSetsOfThree(input)
+    val edges = findBiDirectionalEdges(input)
 
-    var currentGeneration: Set<Set<String>> = setsOfThree
-    while (currentGeneration.size > 1) {
-        currentGeneration = edges.entries
-            .parallelStream()
-            .flatMap { (key, values) ->
-                currentGeneration
-                    .parallelStream()
-                    .filter { set -> values.containsAll(set) }
-                    .map { set -> set + key }
-            }.collect(toSet())
+    val graph = SimpleGraph<String, DefaultEdge>(DefaultEdge::class.java)
+    edges.keys.forEach { graph.addVertex(it) }
+    edges.forEach { vertex, neighbours ->
+        neighbours.forEach { neighbour -> graph.addEdge(vertex, neighbour) }
     }
-    return currentGeneration.first()
+
+    return BronKerboschCliqueFinder(graph).maximumIterator().next()
 }
 
 internal fun containNodeStartingWithT(nodeSets: Set<Set<String>>): Collection<Set<String>> {
@@ -39,10 +36,20 @@ internal fun containNodeStartingWithT(nodeSets: Set<Set<String>>): Collection<Se
 }
 
 internal fun findSetsOfThree(input: List<String>): Set<Set<String>> {
-    return findBiDirectionalEdgesAndSetsOfThree(input).second
+    val biDirectionalEdges = findBiDirectionalEdges(input)
+    val setsOfThree = biDirectionalEdges.keys.flatMap { startNode ->
+        biDirectionalEdges[startNode]!!.twoElementCombinations()
+            .mapNotNull { (first, second) ->
+                when (second in biDirectionalEdges[first]!!) {
+                    true -> setOf(startNode, first, second)
+                    false -> null
+                }
+            }
+    }.toSet()
+    return setsOfThree
 }
 
-private fun findBiDirectionalEdgesAndSetsOfThree(input: List<String>): Pair<MutableMap<String, Set<String>>, Set<Set<String>>> {
+private fun findBiDirectionalEdges(input: List<String>): Map<String, Set<String>>{
     val rawEdges: List<Pair<String, String>> = input
         .map { it.split('-') }
         .map { (first, second) -> first to second }
@@ -59,15 +66,5 @@ private fun findBiDirectionalEdgesAndSetsOfThree(input: List<String>): Pair<Muta
             biDirectionalEdges.merge(key, values, Set<String>::plus)
         }
 
-    val setsOfThree = biDirectionalEdges.keys.flatMap { startNode ->
-        biDirectionalEdges[startNode]!!.twoElementCombinations()
-            .mapNotNull { (first, second) ->
-                when (second in biDirectionalEdges[first]!!) {
-                    true -> setOf(startNode, first, second)
-                    false -> null
-                }
-            }
-    }.toSet()
-
-    return biDirectionalEdges to setsOfThree
+    return biDirectionalEdges
 }
