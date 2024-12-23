@@ -22,13 +22,41 @@ class Day23Solution : StringSolution() {
 internal fun findLargestFullyConnectedSet(input: List<String>): Set<String> {
     val edges = findBiDirectionalEdges(input)
 
-    val graph = SimpleGraph<String, DefaultEdge>(DefaultEdge::class.java)
-    edges.keys.forEach { graph.addVertex(it) }
-    edges.forEach { vertex, neighbours ->
-        neighbours.forEach { neighbour -> graph.addEdge(vertex, neighbour) }
+    return bronKerbosch(emptySet(), edges.keys, emptySet(), edges)!!
+
+//    val graph = SimpleGraph<String, DefaultEdge>(DefaultEdge::class.java)
+//    edges.keys.forEach { graph.addVertex(it) }
+//    edges.forEach { vertex, neighbours ->
+//        neighbours.forEach { neighbour -> graph.addEdge(vertex, neighbour) }
+//    }
+//
+//    return BronKerboschCliqueFinder(graph).maximumIterator().next()
+}
+
+/*
+    Use Bron-Kerbosch to find the maximal clique: https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm
+ */
+private fun bronKerbosch(r: Set<String>, p: Set<String>, x: Set<String>, edges: Map<String, Set<String>>): Set<String>? {
+    if (p.isEmpty()) {
+        if (x.isEmpty()) {
+            return r //r is a maximal clique
+        }
+    }
+    val pPrime = p.toMutableSet()
+    val xPrime = x.toMutableSet()
+
+    val results = mutableListOf<Set<String>?>()
+
+    for (v in p) {
+        val vNeighbours = edges[v]!!
+        results += bronKerbosch(r + v, (pPrime.intersect(vNeighbours)), (xPrime.intersect(vNeighbours)), edges)
+        pPrime.remove(v)
+        xPrime.add(v)
     }
 
-    return BronKerboschCliqueFinder(graph).maximumIterator().next()
+    return results
+        .filterNotNull()
+        .maxByOrNull { it.size }
 }
 
 internal fun containNodeStartingWithT(nodeSets: Set<Set<String>>): Collection<Set<String>> {
