@@ -9,7 +9,53 @@ class Day24Solution : StringSolution() {
         return findZGateOutputs(input).toString()
     }
 
-    override fun part2(input: List<String>) = ""
+    override fun part2(input: List<String>): String {
+        /*
+            The results are sorted alphabetically, so we don't actually
+            need to find the pairs — if we find 8 gates that break the rules
+            and sort them we don't need to determine exactly which gates should
+            be swapped
+         */
+        return findInvalidGates(input)
+            .map { it.outputWire }
+            .sorted()
+            .joinToString(",")
+    }
+}
+
+internal fun findInvalidGates(input: List<String>): Set<Gate> {
+    val gates = parseGates(input)
+    val invalidGates = mutableListOf<Gate>()
+
+    //return any gates that break the rules for a ripple carry adder
+    // https://en.wikipedia.org/wiki/Adder_(electronics)#/media/File:Full-adder_logic_diagram.svg
+
+    // If the output is a zWire, the operator should be XOR (unless it is z45)
+    invalidGates += gates
+        .filter { it.outputWire != "z45" }
+        .filter { it.outputWire.startsWith('z') && it.operation != XOR }
+
+    // If the output is not a zWire and the inputs are not x and y, the operator should be AND or OR
+    invalidGates += gates
+        .filter { !it.outputWire.startsWith('z') }
+        .filter { !(it.sortedInputs[0].startsWith('x')) && !(it.sortedInputs[1].startsWith('y')) }
+        .filter { it.operation !in setOf(AND, OR) }
+
+    // If the inputs are x and y and the operator is XOR, the output wire should be the input of another XOR gate
+    invalidGates += gates
+        .filter { it.sortedInputs != listOf("x00", "y00")}
+        .filter { it.sortedInputs[0].startsWith('x') && it.sortedInputs[1].startsWith('y') }
+        .filter { it.operation == XOR }
+        .filter { gate -> gates.none { gate.outputWire in it.sortedInputs && it.operation == XOR } }
+
+    // If the inputs are x and y and the operator is AND, the output wire should be the input of an OR gate
+    invalidGates += gates
+        .filter { it.sortedInputs != listOf("x00", "y00")}
+        .filter { it.sortedInputs[0].startsWith('x') && it.sortedInputs[1].startsWith('y') }
+        .filter { it.operation == AND }
+        .filter { gate -> gates.none { gate.outputWire in it.sortedInputs && it.operation == OR } }
+
+    return invalidGates.toSet() //some gates break more than one rule
 }
 
 internal fun findZGateOutputs(input: List<String>): Long {

@@ -210,23 +210,27 @@ class Day24SolutionTest {
 
         assert(result == 2024L)
     }
-    
+
+    @Test
+    fun `findInvalidGates should return 8 Gates for production input`() {
+        val gates: Set<Gate> = findInvalidGates(solution.readInput())
+
+        assert(gates.size == 8)
+    }
+
     @Test
     fun `part1 should calculate the decimal result of the z wires`() {
         assert(solution.part1(largerSampleInput) == "2024")
     }
-}
 
-private fun Long.findOneBits() : Sequence<Int> {
-    var remainingValue = this
-    var bitsShiftedSoFar = 0
-    return sequence {
-        while (remainingValue != 0L) {
-            val trailingBits = remainingValue.countTrailingZeroBits()
-            yield(trailingBits + bitsShiftedSoFar)
-            val bitsToShift = trailingBits + 1
-            bitsShiftedSoFar += bitsToShift
-            remainingValue = remainingValue ushr bitsToShift
-        }
+    @Test
+    fun `part2 should return the invalid gates in alphabetical order`() {
+        val input = solution.readInput()
+        val expectedOutput = findInvalidGates(input)
+            .map { it.outputWire }
+            .sorted()
+            .joinToString(",")
+
+        assert(solution.part2(input) == expectedOutput)
     }
 }
