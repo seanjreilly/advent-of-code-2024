@@ -213,6 +213,20 @@ class Day24SolutionTest {
     
     @Test
     fun `part1 should calculate the decimal result of the z wires`() {
-        assert(solution.part1(largerSampleInput) == 2024L)
+        assert(solution.part1(largerSampleInput) == "2024")
+    }
+}
+
+private fun Long.findOneBits() : Sequence<Int> {
+    var remainingValue = this
+    var bitsShiftedSoFar = 0
+    return sequence {
+        while (remainingValue != 0L) {
+            val trailingBits = remainingValue.countTrailingZeroBits()
+            yield(trailingBits + bitsShiftedSoFar)
+            val bitsToShift = trailingBits + 1
+            bitsShiftedSoFar += bitsToShift
+            remainingValue = remainingValue ushr bitsToShift
+        }
     }
 }

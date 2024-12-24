@@ -1,15 +1,15 @@
 package day24
 
 import day24.Operation.*
-import utils.LongSolution
+import utils.StringSolution
 
 fun main() = Day24Solution().run()
-class Day24Solution : LongSolution() {
-    override fun part1(input: List<String>): Long {
-        return findZGateOutputs(input)
+class Day24Solution : StringSolution() {
+    override fun part1(input: List<String>): String {
+        return findZGateOutputs(input).toString()
     }
 
-    override fun part2(input: List<String>) = 0L
+    override fun part2(input: List<String>) = ""
 }
 
 internal fun findZGateOutputs(input: List<String>): Long {
@@ -41,6 +41,7 @@ internal fun findZGateOutputs(input: List<String>): Long {
 }
 
 internal data class Gate(val wire1: String, val wire2: String, val operation: Operation, val outputWire: String) {
+    val sortedInputs by lazy { listOf(wire1, wire2).sorted() }
     fun calculate(x: Int, y: Int): Int {
         return when(operation) {
             AND -> x and y
