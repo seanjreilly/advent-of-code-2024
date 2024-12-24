@@ -48,10 +48,9 @@ internal fun findInvalidGates(input: List<String>): Set<Gate> {
         .filter { it.operation == XOR }
         .filter { gate -> gates.none { gate.outputWire in it.sortedInputs && it.operation == XOR } }
 
-    // If the inputs are x and y and the operator is AND, the output wire should be the input of an OR gate
+    // If the operator is AND, the output wire should be the input of an OR gate
     invalidGates += gates
         .filter { it.sortedInputs != listOf("x00", "y00")}
-        .filter { it.sortedInputs[0].startsWith('x') && it.sortedInputs[1].startsWith('y') }
         .filter { it.operation == AND }
         .filter { gate -> gates.none { gate.outputWire in it.sortedInputs && it.operation == OR } }
 
