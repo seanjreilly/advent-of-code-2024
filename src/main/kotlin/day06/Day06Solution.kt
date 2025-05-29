@@ -18,7 +18,7 @@ class Day06Solution : IntSolution() {
     override fun part2(input: List<String>) : Int {
         val (originalPath, bounds) = findExitPath(input)
 
-        // when looking for cycles, it's fine to start at the point in the original path
+        // When looking for cycles, it's fine to start at the point in the original path
         // just before the obstruction is first reached. A cycle will either include this
         // position or happen entirely after it, and if the path terminates, it will happen after this
         fun findStartPoint(potentialObstruction: Point) : PointAndDirection {
