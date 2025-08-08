@@ -26,6 +26,11 @@ testing {
     }
 }
 
+//tasks.register<Exec>("doBeep") {
+//    commandLine("afplay", "/System/Library/CoreServices/PowerChime.app/Contents/Resources/connect_power.aif")
+//}
+//tasks.test { finalizedBy("doBeep") }
+
 //tasks {
 //    test {
 //        testLogging {
