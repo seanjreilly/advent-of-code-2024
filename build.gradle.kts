@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.1.21"
-    kotlin("plugin.power-assert") version "2.1.21"
+    kotlin("jvm") version "2.2.21"
+    kotlin("plugin.power-assert") version "2.2.21"
     `jvm-test-suite`
 }
 
@@ -14,7 +14,7 @@ kotlin {
     }
     jvmToolchain(21)
     sourceSets.all {
-        languageSettings { languageVersion = "2.0" }
+        languageSettings { languageVersion = "2.2" }
     }
 }
 
